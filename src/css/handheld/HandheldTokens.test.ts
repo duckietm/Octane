@@ -33,7 +33,9 @@ const SHEETS = [
     'HandheldBuildHeight.css',
     'HandheldHousekeeping.css',
     'HandheldModTools.css',
-    'HandheldFortuneWheel.css'
+    'HandheldFortuneWheel.css',
+    'HandheldChatHistory.css',
+    'HandheldRoomSettings.css'
 ];
 
 /** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
@@ -58,7 +60,9 @@ const PHONE_ONLY = [
     'HandheldBuildHeight.css',
     'HandheldHousekeeping.css',
     'HandheldModTools.css',
-    'HandheldFortuneWheel.css'
+    'HandheldFortuneWheel.css',
+    'HandheldChatHistory.css',
+    'HandheldRoomSettings.css'
 ];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */

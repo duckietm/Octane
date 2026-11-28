@@ -12,6 +12,8 @@ import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { BaseButton, Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFriends, useMessageEvent } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomSettingsRightsView } from './HandheldRoomSettingsTabs';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
 interface NavigatorRoomSettingsTabViewProps {
@@ -28,6 +30,7 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
     const [usersWithRights, setUsersWithRights] = useState<Map<number, string>>(new Map());
     const { onlineFriends = [], offlineFriends = [] } = useFriends();
     const pendingActionsRef = useRef<Set<string>>(new Set());
+    const isHandheld = useIsHandheld();
 
     const guardedSend = (key: string, composer: any) => {
         if (pendingActionsRef.current.has(key)) return;
@@ -101,6 +104,19 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
 
         SendMessageComposer(new RoomUsersWithRightsComposer(roomData.roomId));
     }, [roomData]);
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomSettingsRightsView
+                friendsTotal={allFriends.length}
+                friendsWithoutRights={friendsWithoutRights}
+                usersWithRights={Array.from(filteredUsersWithRights.entries())}
+                onClearRights={() => roomData && guardedSend('removeAll', new RemoveAllRightsMessageComposer(roomData.roomId))}
+                onGiveRights={(id) => guardedSend(`give_${id}`, new RoomGiveRightsComposer(id))}
+                onTakeRights={(id) => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

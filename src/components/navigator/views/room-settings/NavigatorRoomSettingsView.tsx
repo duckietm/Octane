@@ -1,8 +1,17 @@
-import { RoomBannedUsersComposer, RoomDataParser, RoomSettingsDataEvent, RoomSettingsSaveErrorEvent, SaveRoomSettingsComposer } from '@octane/renderer';
+import {
+    RoomBannedUsersComposer,
+    RoomDataParser,
+    RoomSettingsDataEvent,
+    RoomSettingsSavedEvent,
+    RoomSettingsSaveErrorEvent,
+    SaveRoomSettingsComposer
+} from '@octane/renderer';
 import { FC, useRef, useState } from 'react';
 import { CreateLinkEvent, IRoomData, LocalizeText, resolveRoomSettingsSaveError, RoomSettingsSaveErrorResult, SendMessageComposer } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomSettingsView, RoomSettingsSaveState } from './HandheldRoomSettingsView';
 import { NavigatorRoomSettingsAccessTabView } from './NavigatorRoomSettingsAccessTabView';
 import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicTabView';
 import { NavigatorRoomSettingsModTabView } from './NavigatorRoomSettingsModTabView';
@@ -26,6 +35,9 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     const [fieldErrors, setFieldErrors] = useState<RoomSettingsSaveErrorResult['errors']>({});
     // AIR's _savedFlatId: a save error is shown only for a save this window sent.
     const pendingSaveRoomId = useRef(0);
+    // Phone only: where the last change stands, shown in the sheet's strip.
+    const [saveState, setSaveState] = useState<RoomSettingsSaveState>('idle');
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<RoomSettingsSaveErrorEvent>(RoomSettingsSaveErrorEvent, (event) => {
         const parser = event.getParser();
@@ -38,6 +50,15 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
 
         setCurrentTab(TABS[result.tab - 1] ?? TABS[0]);
         setFieldErrors(result.errors);
+        setSaveState('error');
+    });
+
+    useMessageEvent<RoomSettingsSavedEvent>(RoomSettingsSavedEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser || !roomData || parser.roomId !== roomData.roomId) return;
+
+        setSaveState((prev) => (prev === 'saving' ? 'saved' : prev));
     });
 
     useMessageEvent<RoomSettingsDataEvent>(RoomSettingsDataEvent, (event) => {
@@ -86,6 +107,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
         });
 
         setFieldErrors({});
+        setSaveState('idle');
         pendingSaveRoomId.current = 0;
         SendMessageComposer(new RoomBannedUsersComposer(data.roomId));
     });
@@ -94,6 +116,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
         setRoomData(null);
         setCurrentTab(TABS[0]);
         setFieldErrors({});
+        setSaveState('idle');
         pendingSaveRoomId.current = 0;
     };
 
@@ -207,6 +230,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
 
         latestRoomData.current = newValue;
         setRoomData(newValue);
+        setSaveState('saving');
 
         SendMessageComposer(
             new SaveRoomSettingsComposer(
@@ -252,6 +276,34 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
 
     if (!roomData) return null;
 
+    const tabContent = (
+        <>
+            {currentTab === TABS[0] && (
+                <NavigatorRoomSettingsBasicTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} onClose={onClose} />
+            )}
+            {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
+            {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
+            {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
+            {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
+        </>
+    );
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomSettingsView
+                activeTab={currentTab}
+                roomName={roomData.roomName}
+                saveState={currentTab === TABS[2] ? null : saveState}
+                tabs={TABS}
+                onClose={onClose}
+                onHelp={currentTab === TABS[3] ? () => CreateLinkEvent('habbopages/chat/options') : undefined}
+                onTab={setCurrentTab}
+            >
+                {tabContent}
+            </HandheldRoomSettingsView>
+        );
+    }
+
     return (
         <NativeTextTree>
             <OctaneCardView handheldSheet
@@ -276,15 +328,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
                         );
                     })}
                 </OctaneCardTabsView>
-                <OctaneCardContentView overflow="auto">
-                    {currentTab === TABS[0] && (
-                        <NavigatorRoomSettingsBasicTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} onClose={onClose} />
-                    )}
-                    {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
-                    {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
-                    {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
-                    {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
-                </OctaneCardContentView>
+                <OctaneCardContentView overflow="auto">{tabContent}</OctaneCardContentView>
             </OctaneCardView>
         </NativeTextTree>
     );

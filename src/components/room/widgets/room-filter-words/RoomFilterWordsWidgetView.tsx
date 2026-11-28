@@ -8,6 +8,8 @@ import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomFilterWordsView } from './HandheldRoomFilterWordsView';
 
 /** The longest word the server keeps (RoomWordFilterModifyEvent cuts anything longer). */
 export const MAX_WORD_LENGTH = 25;
@@ -18,25 +20,29 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
     const [isSelectingWord, setIsSelectingWord] = useState<boolean>(false);
     const { wordsFilter = [], isVisible = null, setWordsFilter, onClose = null } = useFilterWordsWidget();
     const { navigatorData } = useNavigatorData();
+    const isHandheld = useIsHandheld();
 
-    const processAction = (isAddingWord: boolean) => {
-        if (isSelectingWord ? !selectedWord : !word) return;
+    /** Sends one word to add or remove and changes the list as the server will. */
+    const sendFilterChange = (isAddingWord: boolean, value: string) => {
+        if (!value) return;
 
-        SendMessageComposer(new UpdateRoomFilterMessageComposer(navigatorData.enteredGuestRoom.roomId, isAddingWord, isSelectingWord ? selectedWord : word));
+        SendMessageComposer(new UpdateRoomFilterMessageComposer(navigatorData.enteredGuestRoom.roomId, isAddingWord, value));
         setSelectedWord('');
         setWord('bobba');
         setIsSelectingWord(false);
 
-        if (isAddingWord && wordsFilter.includes(isSelectingWord ? selectedWord : word)) return;
+        if (isAddingWord && wordsFilter.includes(value)) return;
 
         setWordsFilter((prevValue) => {
             const newWords = [...prevValue];
 
-            isAddingWord ? newWords.push(isSelectingWord ? selectedWord : word) : newWords.splice(newWords.indexOf(isSelectingWord ? selectedWord : word), 1);
+            isAddingWord ? newWords.push(value) : newWords.splice(newWords.indexOf(value), 1);
 
             return newWords;
         });
     };
+
+    const processAction = (isAddingWord: boolean) => sendFilterChange(isAddingWord, isSelectingWord ? selectedWord : word);
 
     const onTyping = (word: string) => {
         setWord(word);
@@ -49,6 +55,20 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
     };
 
     if (!isVisible) return null;
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomFilterWordsView
+                maxLength={MAX_WORD_LENGTH}
+                word={word}
+                words={wordsFilter ?? []}
+                onAdd={() => sendFilterChange(true, word)}
+                onClose={() => onClose()}
+                onRemove={(value) => sendFilterChange(false, value)}
+                onWord={onTyping}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

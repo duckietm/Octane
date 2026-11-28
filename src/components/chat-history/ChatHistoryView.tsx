@@ -2,8 +2,9 @@ import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLi
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { ChatEntryType, IChatEntry, LocalizeText, localizeWithFallback } from '../../api';
 import { useChatHistory, useIgnoredUsersSnapshot, useNotification } from '../../hooks';
-import { useHandheldKeyboardInset, useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { useHandheldKeyboardInset, useHandheldLayout } from '../../hooks/handheld/useHandheldLayout';
 import { ChatHistoryBubbleView } from './ChatHistoryBubbleView';
+import { HandheldChatHistoryView } from './HandheldChatHistoryView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Hint } from '../../common/Tooltip';
@@ -22,7 +23,8 @@ export const ChatHistoryView: FC<{}> = (props) => {
     const { showConfirm = null } = useNotification();
     const elementRef = useRef<HTMLDivElement>(null);
     const prevChatLength = useRef<number>(0);
-    const isHandheld = useIsHandheld();
+    const handheldLayout = useHandheldLayout();
+    const isHandheld = handheldLayout.active;
     const keyboardInset = useHandheldKeyboardInset();
 
     const filteredChatHistory = useMemo(() => [...chatHistory], [chatHistory]);
@@ -46,6 +48,12 @@ export const ChatHistoryView: FC<{}> = (props) => {
         const element = elementRef.current;
 
         element.scrollTo({ top: element.scrollHeight });
+
+        // The phone list lays out lines off screen lazily (content-visibility), so the height can still grow once the last
+        // lines are drawn: one more step to the end on the next frame.
+        const frame = requestAnimationFrame(() => element.scrollTo({ top: element.scrollHeight }));
+
+        return () => cancelAnimationFrame(frame);
     }, [isHandheld, isVisible, keyboardInset]);
 
     useEffect(() => {
@@ -92,6 +100,19 @@ export const ChatHistoryView: FC<{}> = (props) => {
     const ownUserId = GetSessionDataManager().userId;
     const ignoreLabel = localizeWithFallback('chat.ignore_user.confirm.title', 'Ignore user');
 
+    if (isHandheld) {
+        return (
+            <HandheldChatHistoryView
+                canIgnore={(entry) => canIgnoreFromHistory(entry, ownUserId, ignoredUserIds)}
+                entries={filteredChatHistory}
+                landscape={handheldLayout.orientation === 'landscape'}
+                scrollRef={elementRef}
+                onClose={() => setIsVisible(false)}
+                onIgnore={ignoreFromHistory}
+            />
+        );
+    }
+
     return (
         <NativeTextTree>
             <div className="octane-chat-history">
@@ -121,12 +142,7 @@ export const ChatHistoryView: FC<{}> = (props) => {
                         ))}
                     </div>
                 </div>
-                <BaseButton
-                    className="octane-chat-history-handle"
-                    type="button"
-                    aria-label={isHandheld ? localizeWithFallback('octane.handheld.chat_history.close', 'Close chat history') : undefined}
-                    onClick={() => setIsVisible(false)}
-                />
+                <BaseButton className="octane-chat-history-handle" type="button" onClick={() => setIsVisible(false)} />
             </div>
         </NativeTextTree>
     );

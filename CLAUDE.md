@@ -633,6 +633,15 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `fortune-wheel/HandheldFortuneWheelView` (upright as wide as the screen, on its side height-fitted at the left); the win is
   `WheelWinReveal handheld` as a centred card; the staff settings are a page (`HandheldFortuneWheelSettingsView`) over the
   still-mounted wheel, so a running spin still lands. The loading screen leaves the hotel logo off on phones (`Handheld.css`).
+- Phone room settings and related windows (`src/css/handheld/HandheldRoomSettings.css`): `NavigatorRoomSettingsView` and each tab,
+  `NavigatorRoomInfoView`, `NavigatorRoomCreatorView`, `NavigatorEnforceCategoryView` and `RoomFilterWordsWidgetView` branch on
+  `useIsHandheld()` after their hooks into `Handheld*` twins (tabs in `room-settings/HandheldRoomSettingsTabs.tsx`, shared rows and
+  cards in `HandheldRoomSettingsParts.tsx`): sheets with tabs as pills, a save-state strip from `RoomSettingsSavedEvent`, 44 px check,
+  radio and person rows; the delete and category questions are centred cards with the desktop's text and packets.
+- Phone chat history (`src/css/handheld/HandheldChatHistory.css`): `ChatHistoryView` keeps the links, scrolling and ignore confirm
+  and hands them to `chat-history/HandheldChatHistoryView`, a tall frame sheet ending above the composer (and the keyboard), one
+  sticky-headed section per room visit (`api/chat-history/ChatHistorySections.ts`) with the room's own bubbles; on its side a
+  rooms list on the left scrolls to a room.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /
