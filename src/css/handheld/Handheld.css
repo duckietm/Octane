@@ -212,3 +212,9 @@
 :root[data-handheld] octane-label[data-handheld-size] {
     font-size: var(--octane-handheld-label-size) !important;
 }
+
+/* The loading screen: the hotel logo (280 px) covers half a phone's width over the splash, so a phone shows the splash,
+   the message and the bar without it. */
+:root[data-handheld] .octane-loading__logo {
+    display: none;
+}

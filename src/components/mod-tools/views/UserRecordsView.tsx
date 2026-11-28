@@ -5,6 +5,8 @@ import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../../hooks';
 import { Native0Frame, Native0Rows, Native0Scrollbar, Native0Text } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModRecordsView } from '../handheld/HandheldModListsView';
 
 /** 0 cautions, 1 the user's own bans, 2 banned accounts linked to the user, 3 trade locks. */
 export type UserRecordKind = 0 | 1 | 2 | 3;
@@ -120,16 +122,30 @@ export const UserRecordsView: FC<UserRecordsProps> = ({ userId, userName, kind, 
         setAnswer({ undetailed: kind === 0 ? parser.undetailed : 0, records: parser.records ?? [] });
     });
 
-    if (!answer) return null;
+    const isHandheld = useIsHandheld();
+
+    if (!answer && !isHandheld) return null;
 
     const columns: RecordColumn[] = kind === 2 ? ['date', 'account', 'staff', 'type', 'reason', 'expires'] : ['date', 'staff', 'type', 'reason', 'expires'];
     const lines: string[] = [];
 
-    if (answer.undetailed > 0)
+    if ((answer?.undetailed ?? 0) > 0)
         lines.push(
             localizeWithFallback('octane.mod_tools.records.undetailed', '%count% earlier cautions without details', ['count'], [`${answer.undetailed}`])
         );
-    if (!answer.records.length && !lines.length) lines.push(localizeWithFallback('octane.mod_tools.records.empty', 'No records'));
+    if (answer && !answer.records.length && !lines.length) lines.push(localizeWithFallback('octane.mod_tools.records.empty', 'No records'));
+
+    // phone: a page from the start, a card per record with the same columns as rows
+    if (isHandheld) {
+        return (
+            <HandheldModRecordsView
+                notes={lines}
+                records={answer ? answer.records.map((record, index) => ({ key: `${index}`, fields: columns.map((column) => ({ label: columnTitle(column), value: columnText(column, record) || '—' })) })) : null}
+                title={recordTitle(kind, userName)}
+                onClose={onClose}
+            />
+        );
+    }
 
     const rowCount = answer.records.length + lines.length;
     const clientWidth = width - 12;

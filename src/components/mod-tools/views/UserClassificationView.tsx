@@ -4,6 +4,9 @@ import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Frame, Native0Rows, Native0Scrollbar, Native0Text } from '../native/NativeWindow0';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModClassificationView } from '../handheld/HandheldModListsView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -36,6 +39,19 @@ export const UserClassificationView: FC<UserClassificationProps> = ({ entries, x
     const visit = rectOf(findNativeNode(root, 'visit_room_txt'));
     const visitCaption = nativeCaption(findNativeNode(root, 'visit_room_txt'));
     const [offset, setOffset] = useState(0);
+    const isHandheld = useIsHandheld();
+
+    // phone: the classified users as rows that open their user info ("Visit" does nothing on the desktop either, so it is left out)
+    if (isHandheld) {
+        return (
+            <HandheldModClassificationView
+                entries={entries}
+                title={localizeWithFallback('octane.handheld.mod_tools.classification_title', 'User classification')}
+                onClose={onClose}
+                onOpenUserInfo={onOpenUserInfo}
+            />
+        );
+    }
 
     const clientWidth = width - 12;
     const viewHeight = height - 32;

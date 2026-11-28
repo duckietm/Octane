@@ -1,6 +1,13 @@
 import { AchievementData } from '@octane/renderer';
 import { FC } from 'react';
-import { AchievementUtilities, LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText } from '../../api';
+import {
+    AchievementUtilities,
+    getAchievementShowsProgress,
+    getAchievementShowsReward,
+    LocalizeBadgeDescription,
+    LocalizeBadgeName,
+    LocalizeText
+} from '../../api';
 import { LayoutCurrencyIcon } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { AchievementBadgeView } from './AchievementBadgeView';
@@ -16,9 +23,9 @@ export const AchievementDetailsView: FC<AchievementDetailsViewProps> = (props) =
     if (!achievement) return null;
 
     const badgeCode = AchievementUtilities.getAchievementBadgeCode(achievement);
-    // Polaris also supports credit rewards with currency type -1.
-    const showReward = !achievement.finalLevel && achievement.levelRewardPointType >= -1 && achievement.levelRewardPoints > 0;
-    const showProgress = achievement.displayMethod !== AchievementData.DISPLAY_METHOD_NEVER_SHOW_PROGRESS && !achievement.finalLevel;
+    // Credit rewards (currency type -1) count too.
+    const showReward = getAchievementShowsReward(achievement);
+    const showProgress = getAchievementShowsProgress(achievement);
 
     return (
         <NativeTextTree>

@@ -1,6 +1,8 @@
 import { FC, useMemo, useState } from 'react';
 import { localizeWithFallback } from '../../../api';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModChatlogPageView } from '../handheld/HandheldModChatlogView';
 import { Native0Frame, Native0Input, Native0Text } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { chatlineMatches } from './chatlogFilter';
@@ -50,6 +52,25 @@ export const EvidenceChatlogView: FC<EvidenceChatlogProps> = ({ kind, id, x, y, 
 
         return { total, kept };
     }, [evidence, currentQuery]);
+
+    const isHandheld = useIsHandheld();
+
+    // phone: a page of the sheet that is there from the start (with "Loading..." until the answer arrives)
+    if (isHandheld) {
+        return (
+            <HandheldModChatlogPageView
+                countText={currentQuery.trim().length ? `${counts.kept}/${counts.total}` : `${counts.total}`}
+                evidence={evidence}
+                query={currentQuery}
+                title={evidence?.caption ?? localizeWithFallback('octane.mod_tools.chatlog', 'Chatlog')}
+                onClose={onClose}
+                onEnterRoom={onEnterRoom}
+                onOpenRoomTool={onOpenRoomTool}
+                onOpenUserInfo={onOpenUserInfo}
+                onQuery={setQuery}
+            />
+        );
+    }
 
     if (!evidence) return null;
 

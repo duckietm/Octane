@@ -27,7 +27,13 @@ const SHEETS = [
     'HandheldCamera.css',
     'HandheldHotelView.css',
     'HandheldCollectibles.css',
-    'HandheldWiredTools.css'
+    'HandheldWiredTools.css',
+    'HandheldAchievements.css',
+    'HandheldMentions.css',
+    'HandheldBuildHeight.css',
+    'HandheldHousekeeping.css',
+    'HandheldModTools.css',
+    'HandheldFortuneWheel.css'
 ];
 
 /** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
@@ -46,7 +52,13 @@ const PHONE_ONLY = [
     'HandheldCamera.css',
     'HandheldHotelView.css',
     'HandheldCollectibles.css',
-    'HandheldWiredTools.css'
+    'HandheldWiredTools.css',
+    'HandheldAchievements.css',
+    'HandheldMentions.css',
+    'HandheldBuildHeight.css',
+    'HandheldHousekeeping.css',
+    'HandheldModTools.css',
+    'HandheldFortuneWheel.css'
 ];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */

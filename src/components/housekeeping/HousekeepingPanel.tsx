@@ -1,22 +1,14 @@
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
 import { HousekeepingTabId, LocalizeText } from '../../api';
 import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, WidgetErrorBoundary } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { HousekeepingDangerConfirmView } from './HousekeepingDangerConfirmView';
 import { HousekeepingPasswordReveal } from './HousekeepingPasswordReveal';
 import { HousekeepingStatusBanner } from './HousekeepingStatusBanner';
-import { HousekeepingAuditTab } from './views/audit/HousekeepingAuditTab';
-import { HousekeepingBansTab } from './views/bans/HousekeepingBansTab';
-import { HousekeepingProfileImagesTab } from './views/profile-images/HousekeepingProfileImagesTab';
-import { HousekeepingDashboardTab } from './views/dashboard/HousekeepingDashboardTab';
-import { HousekeepingHotelTab } from './views/hotel/HousekeepingHotelTab';
-import { HousekeepingLiveTab } from './views/live/HousekeepingLiveTab';
-import { HousekeepingPermissionsTab } from './views/permissions/HousekeepingPermissionsTab';
-import { HousekeepingRoomsTab } from './views/rooms/HousekeepingRoomsTab';
 import { HousekeepingNavGroup, HousekeepingSidebar } from './views/shell/HousekeepingSidebar';
-import { HousekeepingSoundboardTab } from './views/soundboard/HousekeepingSoundboardTab';
-import { HousekeepingSupportTab } from './views/support/HousekeepingSupportTab';
-import { HousekeepingUsersTab } from './views/users/HousekeepingUsersTab';
+import { HousekeepingTabContent } from './views/shell/HousekeepingTabContent';
+import { HandheldHousekeepingView } from './HandheldHousekeepingView';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface HousekeepingPanelProps {
@@ -32,34 +24,20 @@ export interface HousekeepingPanelProps {
  * the panel (see HousekeepingView), so players never download the staff tools.
  */
 export const HousekeepingPanel: FC<HousekeepingPanelProps> = ({ activeTab, navGroups, canManageSoundboard, onSelectTab, onClose }) => {
-    const activeView = useMemo(() => {
-        switch (activeTab) {
-            case HousekeepingTabId.LIVE:
-                return <HousekeepingLiveTab />;
-            case HousekeepingTabId.ROOMS:
-                return <HousekeepingRoomsTab />;
-            case HousekeepingTabId.SUPPORT:
-                return <HousekeepingSupportTab />;
-            case HousekeepingTabId.BANS:
-                return <HousekeepingBansTab />;
-            case HousekeepingTabId.PROFILE_IMAGES:
-                return <HousekeepingProfileImagesTab />;
-            case HousekeepingTabId.AUDIT:
-                return <HousekeepingAuditTab />;
-            case HousekeepingTabId.HOTEL:
-                return <HousekeepingHotelTab />;
-            case HousekeepingTabId.PERMISSIONS:
-                return <HousekeepingPermissionsTab />;
-            case HousekeepingTabId.SOUNDBOARD:
-                return canManageSoundboard ? <HousekeepingSoundboardTab /> : <HousekeepingUsersTab />;
-            case HousekeepingTabId.USERS:
-            case HousekeepingTabId.ECONOMY:
-                return <HousekeepingUsersTab />;
-            case HousekeepingTabId.DASHBOARD:
-            default:
-                return <HousekeepingDashboardTab />;
-        }
-    }, [activeTab, canManageSoundboard]);
+    const isHandheld = useIsHandheld();
+
+    // On a phone the same sections, banners and confirmation sit in the phone sheet instead of the window.
+    if (isHandheld) {
+        return (
+            <HandheldHousekeepingView
+                activeTab={activeTab}
+                canManageSoundboard={canManageSoundboard}
+                navGroups={navGroups}
+                onClose={onClose}
+                onSelectTab={onSelectTab}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -77,7 +55,7 @@ export const HousekeepingPanel: FC<HousekeepingPanelProps> = ({ activeTab, navGr
                             <HousekeepingStatusBanner />
                             <HousekeepingPasswordReveal />
                             <OctaneCardContentView className="min-h-0 grow text-black" gap={2}>
-                                {activeView}
+                                <HousekeepingTabContent activeTab={activeTab} canManageSoundboard={canManageSoundboard} />
                             </OctaneCardContentView>
                         </div>
                         <HousekeepingDangerConfirmView />

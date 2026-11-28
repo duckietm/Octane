@@ -8,6 +8,8 @@ import '../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { formatBuildHeight, getBuildHeightMarks, roundBuildHeight } from './buildHeightScale';
 import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldBuildHeightView } from './HandheldBuildHeightView';
 
 const STEP = 0.1;
 
@@ -16,6 +18,7 @@ const UNDERPASS_MIN_HEIGHT = 1.5;
 export const BuildHeightWidgetView: FC<{}> = () => {
     const { available, minHeight, maxHeight, isOpen, height, underpass, applyHeight, toggleUnderpass, close } = useBuildHeight();
 
+    const isHandheld = useIsHandheld();
     const underpassAllowed = height >= UNDERPASS_MIN_HEIGHT;
 
     useEffect(() => {
@@ -30,6 +33,23 @@ export const BuildHeightWidgetView: FC<{}> = () => {
     };
     const marks = getBuildHeightMarks(minHeight, maxHeight);
     const floorLevel = Math.min(maxHeight, Math.max(minHeight, 0));
+
+    if (isHandheld) {
+        return (
+            <HandheldBuildHeightView
+                floorLevel={floorLevel}
+                height={height}
+                maxHeight={maxHeight}
+                minHeight={minHeight}
+                underpass={underpass}
+                underpassAllowed={underpassAllowed}
+                underpassMinHeight={UNDERPASS_MIN_HEIGHT}
+                onClose={close}
+                onHeight={setHeight}
+                onUnderpass={toggleUnderpass}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

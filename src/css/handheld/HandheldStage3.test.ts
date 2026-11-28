@@ -55,6 +55,10 @@ describe('phone layout, stage 3 stylesheets', () => {
         expect(frames).toMatch(/\.octane-air-modal__window\[data-handheld-scaled\] \{[^}]*zoom: var\(--octane-handheld-scale, 1\)/);
     });
 
+    it('leaves the hotel logo off the loading screen on a phone', () => {
+        expect(read('src/css/handheld/Handheld.css')).toMatch(/:root\[data-handheld\] \.octane-loading__logo \{[^}]*display: none/);
+    });
+
     it('keeps phone text fields at 16 px, so mobile Safari does not zoom into them', () => {
         const social = read('src/css/handheld/HandheldSocial.css');
 

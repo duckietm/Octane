@@ -167,6 +167,12 @@ import './css/handheld/HandheldCamera.css';
 import './css/handheld/HandheldHotelView.css';
 import './css/handheld/HandheldCollectibles.css';
 import './css/handheld/HandheldWiredTools.css';
+import './css/handheld/HandheldAchievements.css';
+import './css/handheld/HandheldMentions.css';
+import './css/handheld/HandheldBuildHeight.css';
+import './css/handheld/HandheldHousekeeping.css';
+import './css/handheld/HandheldModTools.css';
+import './css/handheld/HandheldFortuneWheel.css';
 import './css/common/ClassicScrollbar.css';
 
 document.documentElement.classList.add('has-classic-scrollbar');

@@ -1,12 +1,14 @@
 import { GetRoomVisitsMessageComposer, RoomVisitsEvent, RoomVisitsData } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { SendMessageComposer } from '../../../api';
+import { localizeWithFallback, SendMessageComposer } from '../../../api';
 import { useMessageEvent } from '../../../hooks';
 import roomVisitsXml from '../../../assets/mod-tools/xml/roomvisits_frame.xml?raw';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, nativeScaledRect, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Frame, Native0Rows, Native0Scrollbar, Native0Text } from '../native/NativeWindow0';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModRoomVisitsView } from '../handheld/HandheldModListsView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -51,6 +53,23 @@ export const RoomVisitsView: FC<RoomVisitsProps> = ({ userId, x, y, width, heigh
 
         if (parser?.data?.userId === userId) setData(parser.data);
     });
+
+    const isHandheld = useIsHandheld();
+
+    // phone: a page that is there from the start, the visits as cards once they arrive
+    if (isHandheld) {
+        return (
+            <HandheldModRoomVisitsView
+                enterLabel={enterCaption}
+                roomToolLabel={localizeWithFallback('octane.mod_tools.room_tool', 'Room tool')}
+                title={data ? `Room visits: ${data.userName} (${data.rooms.length})` : nativeCaption(root)}
+                visits={data ? data.rooms.map((room, index) => ({ key: `${index}`, time: `${pad(room.enterHour)}:${pad(room.enterMinute)}`, roomId: room.roomId, roomName: room.roomName })) : null}
+                onClose={onClose}
+                onEnterRoom={onEnterRoom}
+                onOpenRoomTool={onOpenRoomTool}
+            />
+        );
+    }
 
     if (!data) return null;
 

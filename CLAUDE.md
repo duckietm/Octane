@@ -614,6 +614,25 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   (`renderSlotContent`) and its editor forms to `hotel-view/HandheldHotelView.tsx`: the art as a picture across the top with the
   slots as glass cards scrolling over it (on its side scene left, cards right), a green home-room button, staff pencils opening
   the editors as a sheet. Drag-placing slots stays desktop-only.
+- Phone mod tools (`src/css/handheld/HandheldModTools.css`): `ModToolsView` keeps the tracker, links and state and, on a phone,
+  shows the tracker's windows as pages of one sheet (`mod-tools/handheld/HandheldModToolsView`; tabs = Start + open tools; page
+  order in `api/mod-tools/handheldModPages.ts`; toggling an open window brings its page to the front). Each view branches on
+  `useIsHandheld()` after its hooks into a `HandheldMod*` twin inside `HandheldModPage`; pages stay mounted while hidden;
+  `ModConfirmView` / `NativeAlertView` are cards over the sheet.
+- Phone housekeeping (`src/css/handheld/HandheldHousekeeping.css`): `HousekeepingPanel` hands its props to
+  `housekeeping/HandheldHousekeepingView` (start list of sections under the global search, each section a page, beside the list on
+  its side). The pages are the desktop's own (`views/shell/HousekeepingTabContent`); server lists, the permission matrix and the
+  word filter branch into card lists (`pickHousekeepingListCardFields`); forms mark their Save row `hk-form-actions`.
+- Phone achievements, mentions and build height (`HandheldAchievements.css`, `HandheldMentions.css`, `HandheldBuildHeight.css`):
+  `AchievementsView` hands its data to `achievements/HandheldAchievementsView` (summary, category tiles, achievement cards; order and
+  reward rules shared in `api/achievements/AchievementDisplay.ts`); `MentionsView` to `mentions/HandheldMentionsView`;
+  `BuildHeightWidgetView` renders `room/widgets/HandheldBuildHeightView`, a build-tools-style drawer panel that steps aside from
+  another open drawer through the drawer's `className`.
+- Phone wheel of fortune (`src/css/handheld/HandheldFortuneWheel.css`): `FortuneWheelView` keeps its state, packets and spin and
+  hands its wheel `stage` (shared with the desktop, so slice maths and landing are the same) to
+  `fortune-wheel/HandheldFortuneWheelView` (upright as wide as the screen, on its side height-fitted at the left); the win is
+  `WheelWinReveal handheld` as a centred card; the staff settings are a page (`HandheldFortuneWheelSettingsView`) over the
+  still-mounted wheel, so a running spin still lands. The loading screen leaves the hotel logo off on phones (`Handheld.css`).
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

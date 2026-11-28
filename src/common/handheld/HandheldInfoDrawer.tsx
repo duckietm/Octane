@@ -78,6 +78,8 @@ interface HandheldInfoDrawerProps {
     actions?: ReactNode | ((open: boolean) => ReactNode);
     /** A heading over the whole action grid (the open drawer shows it); grouped actions bring their own headings instead. */
     actionsLabel?: string;
+    /** A class of the module on the drawer itself, for its own rules (the build height panel). */
+    className?: string;
 }
 
 /**
@@ -98,7 +100,8 @@ export const HandheldInfoDrawer: FC<HandheldInfoDrawerProps> = ({
     isPage = false,
     details = null,
     actions = null,
-    actionsLabel
+    actionsLabel,
+    className
 }) => {
     const { orientation } = useHandheldLayout();
     const [pulled, setPulled] = useState(0);
@@ -172,7 +175,7 @@ export const HandheldInfoDrawer: FC<HandheldInfoDrawerProps> = ({
             <section
                 ref={drawerRef}
                 aria-label={label}
-                className="octane-handheld-drawer"
+                className={className ? `octane-handheld-drawer ${className}` : 'octane-handheld-drawer'}
                 data-kind={kind}
                 data-page={page ? '' : undefined}
                 data-pulling={pulled > 0 ? '' : undefined}

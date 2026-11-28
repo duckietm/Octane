@@ -9,6 +9,8 @@ import { NativeWindowShell } from '../native/NativeWindowShell';
 import { UserInfoPanel } from './UserInfoPanel';
 import { UserRecordKind } from './UserRecordsView';
 import { localizeWithFallback } from '../../../api';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModPage } from '../handheld/HandheldModPage';
 
 export interface UserInfoProps {
     userId: number;
@@ -33,6 +35,25 @@ export const UserInfoView: FC<UserInfoProps> = ({ userId, settings, x, y, onClos
     const root = useMemo(() => parseNativeLayout(userInfoFrameXml), []);
     const panelHeight = useMemo(() => nativeNumber(parseNativeLayout(userInfoXml), 'height'), []);
     const height = Math.max(nativeNumber(root, 'height'), CLIENT_TOP + panelHeight + CLIENT_BOTTOM);
+    const isHandheld = useIsHandheld();
+
+    // phone: the window is a page of the mod tools sheet, the panel draws itself as rows and buttons
+    if (isHandheld) {
+        return (
+            <HandheldModPage title={localizeWithFallback('octane.mod_tools.user_info', 'User Info')} onClose={onClose}>
+                <UserInfoPanel
+                    handheldPageTitle
+                    settings={settings}
+                    userId={userId}
+                    onOpenChatlog={onOpenChatlog}
+                    onOpenModAction={onOpenModAction}
+                    onOpenRecords={onOpenRecords}
+                    onOpenRoomVisits={onOpenRoomVisits}
+                    onOpenSendMessage={onOpenSendMessage}
+                />
+            </HandheldModPage>
+        );
+    }
 
     return (
         <NativeTextTree>

@@ -4,6 +4,8 @@ import { NativeText } from '../../../common/native-text/NativeText';
 import { useModAlertStore } from '../../../hooks';
 import { Native3Frame, Native3ThickButton } from '../native/NativeWindow3';
 import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModAlertView } from '../handheld/HandheldModSanctionViews';
 
 const BODY_COLOR = 0xe9e9e1;
 
@@ -47,6 +49,18 @@ export const NativeWindowAlert: FC<{ title: string; message: string; onClose: ()
 export const NativeAlertView: FC<{}> = () => {
     const alerts = useModAlertStore((state) => state.alerts);
     const close = useModAlertStore((state) => state.close);
+    const isHandheld = useIsHandheld();
+
+    // phone: each alert is a card over the sheet with its Ok
+    if (isHandheld) {
+        return (
+            <>
+                {alerts.map((alert) => (
+                    <HandheldModAlertView key={alert.id} message={alert.message} title={alert.title} onClose={() => close(alert.id)} />
+                ))}
+            </>
+        );
+    }
 
     return (
         <>

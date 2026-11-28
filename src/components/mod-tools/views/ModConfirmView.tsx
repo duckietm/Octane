@@ -3,6 +3,8 @@ import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeText } from '../../../common/native-text/NativeText';
 import { Native3Frame, Native3ThickButton } from '../native/NativeWindow3';
 import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModConfirmView } from '../handheld/HandheldModSanctionViews';
 
 const BODY_COLOR = 0xe9e9e1;
 const WIDTH = 278;
@@ -23,6 +25,7 @@ interface ModConfirmViewProps {
 export const ModConfirmView: FC<ModConfirmViewProps> = ({ title, message, confirmLabel, cancelLabel, onConfirm, onCancel }) => {
     const summaryRef = useRef<HTMLDivElement>(null);
     const [summaryHeight, setSummaryHeight] = useState(57);
+    const isHandheld = useIsHandheld();
 
     useLayoutEffect(() => {
         const element = summaryRef.current;
@@ -39,6 +42,9 @@ export const ModConfirmView: FC<ModConfirmViewProps> = ({ title, message, confir
 
         return () => observer.disconnect();
     }, [message]);
+
+    // phone: a card over the sheet with the same two choices
+    if (isHandheld) return <HandheldModConfirmView cancelLabel={cancelLabel} confirmLabel={confirmLabel} message={message} title={title} onCancel={onCancel} onConfirm={onConfirm} />;
 
     const height = 141 + (summaryHeight - 57);
     const buttonY = 81 + (summaryHeight - 57);
