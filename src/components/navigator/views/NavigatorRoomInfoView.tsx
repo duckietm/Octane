@@ -30,6 +30,8 @@ import { classNames } from '../../../layout';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomInfoView } from './HandheldRoomInfoView';
 
 export interface NavigatorRoomInfoViewProps {
     onCloseClick: () => void;
@@ -46,6 +48,7 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
     const canUseRoomThumbnailCamera = useHasPermission('acc_camera');
     const canStaffPick = useHasPermission('acc_staff_pick');
     const canOpenHousekeeping = useHasPermission('acc_housekeeping') && isHousekeepingEnabled();
+    const isHandheld = useIsHandheld();
 
     const enteredRoomId = navigatorData?.enteredGuestRoom?.roomId ?? 0;
     // AIR refreshRaidProtectionButton: the room's capability packet says whether the viewer may manage it.
@@ -145,6 +148,31 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
     }, [navigatorData]);
 
     if (!navigatorData?.enteredGuestRoom) return null;
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomInfoView
+                access={{
+                    settings: hasPermission('settings'),
+                    camera: hasPermission('settings') && canUseRoomThumbnailCamera,
+                    favourite: GetSessionDataManager().userId !== navigatorData.enteredGuestRoom.ownerId,
+                    removeRights: hasPermission('guest'),
+                    raidProtection: canManageRaidProtection,
+                    floorPlan: hasPermission('settings') || hasPermission('floor'),
+                    staffPick: hasPermission('staff_pick'),
+                    housekeeping: canOpenHousekeeping && enteredRoomId > 0
+                }}
+                isFavourite={isRoomInFavouritesList}
+                isHome={navigatorData.homeRoomId === navigatorData.enteredGuestRoom.roomId}
+                isMuted={isRoomMuted}
+                isPicked={isRoomPicked}
+                rating={navigatorData.currentRoomRating}
+                room={navigatorData.enteredGuestRoom}
+                onAction={(action) => processAction(action)}
+                onHousekeeping={() => CreateLinkEvent(`housekeeping/room/${enteredRoomId}`)}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

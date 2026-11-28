@@ -1,0 +1,1305 @@
+/*
+ * The shop's dialogs on a phone, in the Octane handheld look (HandheldTokens.css), beside the shop itself
+ * (HandheldCatalog.css). Confirmations are cards in the middle of a dim layer over the shop (purchase, club purchase,
+ * club gift, marketplace tokens: HandheldShopCard); the bigger windows are full-screen frame sheets with a bottom bar
+ * for the main action (gift wrapping, marketplace offer, HC benefits, targeted offer, special items, dragon adoption:
+ * HandheldShopSheet). Buttons are the shop panel's pills: white, or green for the main action. Every rule is scoped
+ * to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+/* ================================================================ the card over the shop */
+
+/* The card's window is a full-screen layer of its own (so it is above the shop sheet): no frame colours of a sheet. */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'][data-handheld-fullscreen]:has(> .octane-handheld-shop-dialog) {
+    padding: 0;
+    background: transparent;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--hh-space-4) + var(--octane-safe-top)) calc(var(--hh-space-4) + var(--octane-safe-right)) calc(var(--hh-space-4) + var(--octane-safe-bottom))
+        calc(var(--hh-space-4) + var(--octane-safe-left));
+    background: var(--hh-air-outline);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog {
+    padding-top: calc(var(--hh-space-2) + var(--octane-safe-top));
+    padding-bottom: calc(var(--hh-space-2) + var(--octane-safe-bottom));
+}
+
+/* Base UI's portal wrapper takes no box: the card is the layer's own child for the layout. */
+:root[data-handheld] .octane-handheld-shop-dialog > .octane-inline-dialog-host {
+    display: contents;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog :where(button, input, textarea) {
+    margin: 0;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__card {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+    max-height: 100%;
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-float);
+    outline: none;
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog__card {
+    max-width: 600px;
+}
+
+/* The head in the sheet header's blue, so the card reads as the shop's. */
+:root[data-handheld] .octane-handheld-shop-dialog__head {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 52px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-2) var(--hh-space-4);
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line) 0%, var(--hh-air-blue-header) 100%);
+    box-shadow: var(--hh-edge);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog__head {
+    min-height: 44px;
+    padding-top: var(--hh-space-1);
+    padding-bottom: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__title {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Close: the sheet's round red button; the finger gets 44 px around it. */
+:root[data-handheld] .octane-handheld-shop-dialog__close {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    box-shadow:
+        inset 0 1px 0 var(--hh-hairline),
+        0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__close::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__close:active {
+    background: var(--hh-air-red-deep);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__close:disabled {
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__close svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+/* Picture and texts; this part scrolls when the card is higher than the screen, the buttons stay. */
+:root[data-handheld] .octane-handheld-shop-dialog__main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-height: 0;
+    padding: var(--hh-space-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* On its side the picture stands at the left of the texts, so the card stays low. */
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog__main.has-hero {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--hh-space-4);
+    padding: var(--hh-space-3) var(--hh-space-4);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__hero {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog__hero {
+    flex: 0 0 200px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+/* The product on the shop's cream, like a tile of the grid, only bigger; a large preview is cut off at its edge. */
+:root[data-handheld] .octane-handheld-shop-dialog__picture {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 128px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-cream);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog__picture {
+    width: 200px;
+    height: 160px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__picture > * {
+    flex: none;
+    max-width: 100%;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__picture > img {
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* The club's mark (the club purchase), the AIR sprite drawn at twice its size. */
+:root[data-handheld] .octane-handheld-shop-dialog__club-mark {
+    display: block;
+    width: 85px;
+    height: 40px;
+    margin: var(--hh-space-2) auto;
+    background: url("../../assets/images/catalog/air/habbo-icons.png") -177px -49px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    zoom: 2;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__name {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__text {
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__chip {
+    box-sizing: border-box;
+    padding: 2px var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__chip.is-bonus {
+    background: var(--hh-air-green-deep);
+    color: var(--hh-on-primary);
+}
+
+/* The price: "Cost" at the left, the amounts with their currency icons at the right, as on the shop tiles. */
+:root[data-handheld] .octane-handheld-shop-dialog__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-1) var(--hh-space-3);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__price-label {
+    margin-right: auto;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__price-parts {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-1) var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__price-part {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__price-part strong {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__price-part .octane-currency-icon {
+    flex: none;
+}
+
+/* In a sheet's bottom bar the price stands beside the button, without the "Cost" label and its background. */
+:root[data-handheld] .octane-handheld-shop-dialog__price.is-bar {
+    flex: 0 1 auto;
+    padding: 0 var(--hh-space-2);
+    background: transparent;
+}
+
+/* A limited edition: how many are left; or the raffle the server holds the purchase in. */
+:root[data-handheld] .octane-handheld-shop-dialog__note {
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-tip);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+/* The credit-spending disclaimer (and the moderator's "show my face"): a check row a finger can hit. */
+:root[data-handheld] .octane-handheld-shop-dialog__check {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__check .octane-checkbox {
+    flex: none;
+    width: 24px;
+    height: 24px;
+}
+
+/* Cancel at the left, the main action at the right: two even pills. */
+:root[data-handheld] .octane-handheld-shop-dialog__actions {
+    display: grid;
+    flex: none;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3) var(--hh-space-4) var(--hh-space-4);
+    border-top: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dialog__actions {
+    padding: var(--hh-space-2) var(--hh-space-4) var(--hh-space-3);
+}
+
+/* ================================================================ buttons */
+
+:root[data-handheld] .octane-handheld-shop-dialog__button {
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__button:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__button.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__button:disabled {
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.5;
+}
+
+/* "Copy suggested price": a lighter outline pill that does not compete with the main action. */
+:root[data-handheld] .octane-handheld-shop-dialog__button.is-outline {
+    flex: none;
+    height: 40px;
+    border-color: var(--hh-air-blue-light);
+    box-shadow: none;
+    color: var(--hh-air-blue-deep);
+    font-size: var(--hh-size-m);
+}
+
+/* A round − / + of a stepper. */
+:root[data-handheld] .octane-handheld-shop-dialog__button.is-step {
+    flex: 0 0 var(--hh-touch);
+    width: var(--hh-touch);
+    padding: 0;
+    color: var(--hh-air-blue-deep);
+    font-size: var(--hh-size-xl);
+}
+
+:root[data-handheld] :is(.octane-handheld-shop-dialog, .octane-handheld-shop-sheet) :where(button, input, textarea):focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dialog__head .octane-handheld-shop-dialog__close:focus-visible {
+    outline: var(--hh-focus-on-dark);
+}
+
+/* ================================================================ the sheets */
+
+/* The content scrolls between the header and the bar; nothing in it is wider than the screen. */
+:root[data-handheld] .octane-handheld-shop-sheet__scroll {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: 0;
+    margin: 0 calc(-1 * var(--hh-space-3));
+    padding: 0 var(--hh-space-3) var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__scroll > * {
+    flex: none;
+    min-width: 0;
+}
+
+/* The main action at the bottom, in reach of the thumb. */
+:root[data-handheld] .octane-handheld-shop-sheet__bar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    margin: 0 calc(-1 * var(--hh-space-3)) calc(-1 * var(--hh-space-2));
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-sheet__bar {
+    padding-bottom: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__section {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__caption,
+:root[data-handheld] .octane-handheld-shop-sheet__label {
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__label.is-disabled {
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__name {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__muted {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__muted.is-bar {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__picture {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 112px;
+    height: 112px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-cream);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__picture > * {
+    flex: none;
+}
+
+/* Fields at 16 px, so the phone does not zoom into them. */
+:root[data-handheld] .octane-handheld-shop-sheet__field {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    outline: none;
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__field:focus {
+    border-color: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__field.is-invalid {
+    border-color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__field.is-area {
+    height: 96px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    resize: none;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__field.is-amount {
+    flex: 1 1 0;
+    text-align: center;
+}
+
+/* The NumberInput's own up / down overlay is left out: the stepper has finger-sized − and +. */
+:root[data-handheld] .octane-handheld-shop-sheet__stepper .octane-number-input {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__stepper .octane-number-input input {
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--hh-touch);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+/* What a sale earns (green) or why the price is refused (red). */
+:root[data-handheld] .octane-handheld-shop-sheet__status {
+    box-sizing: border-box;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-s);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__status.is-valid {
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-green-deep);
+}
+
+:root[data-handheld] .octane-handheld-shop-sheet__status.is-invalid {
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-red-deep);
+}
+
+/* On its side a sheet uses the width: two columns of cards (each sheet names its own). */
+:root[data-handheld='landscape'] .octane-handheld-shop-market .octane-handheld-shop-sheet__scroll,
+:root[data-handheld='landscape'] .octane-handheld-shop-gift .octane-handheld-shop-sheet__scroll,
+:root[data-handheld='landscape'] .octane-handheld-shop-vip .octane-handheld-shop-sheet__scroll,
+:root[data-handheld='landscape'] .octane-handheld-shop-offer .octane-handheld-shop-sheet__scroll,
+:root[data-handheld='landscape'] .octane-handheld-shop-special .octane-handheld-shop-sheet__scroll,
+:root[data-handheld='landscape'] .octane-handheld-shop-dragon .octane-handheld-shop-sheet__scroll {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+}
+
+/* ---------------------------------------------------------------- marketplace offer */
+
+:root[data-handheld] .octane-handheld-shop-market__item {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-shop-market__about {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-shop-market__marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-market__stat {
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+/* ---------------------------------------------------------------- gift wrapping */
+
+:root[data-handheld] .octane-handheld-shop-gift__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+}
+
+/* Friends whose name matches: rows under the field. */
+:root[data-handheld] .octane-handheld-shop-gift__friends {
+    display: flex;
+    flex-direction: column;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__friend {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    width: 100%;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-bottom: 1px solid var(--hh-air-box);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-l);
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__friend:last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__friend:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__friend strong {
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+}
+
+/* The note: the sender's head (or the incognito mark) beside the message, the signature under it. */
+:root[data-handheld] .octane-handheld-shop-gift__note {
+    background: var(--hh-air-track-free);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__note-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__sender {
+    display: flex;
+    flex: 0 0 52px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__sender > * {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__signature {
+    align-self: flex-end;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    font-style: italic;
+    line-height: 16px;
+}
+
+/* The wrapped gift as it will stand in the room. */
+:root[data-handheld] .octane-handheld-shop-gift__preview {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    height: 132px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-cream);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__preview > * {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-gift__preview {
+    height: 96px;
+}
+
+/* Box and ribbon: ‹ name › with round arrows. */
+:root[data-handheld] .octane-handheld-shop-gift__stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__stepper.is-disabled {
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__arrow {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__arrow:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__arrow:disabled {
+    box-shadow: none;
+    cursor: default;
+}
+
+:root[data-handheld] :is(.octane-handheld-shop-gift__arrow, .octane-handheld-shop-special__nav) svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__step-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__step-text strong {
+    max-width: 100%;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__price {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+/* The colours: finger-sized tiles, the chosen one ringed in the selection blue. */
+:root[data-handheld] .octane-handheld-shop-gift__colors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--hh-touch), 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__color {
+    box-sizing: border-box;
+    height: var(--hh-touch);
+    padding: 0;
+    border: 3px solid var(--hh-air-white);
+    border-radius: var(--hh-radius-s);
+    background: var(--octane-gift-palette-color, var(--hh-air-box));
+    box-shadow: 0 0 0 1px var(--hh-air-box-line);
+    cursor: pointer;
+    transition:
+        box-shadow var(--hh-fast) var(--hh-ease),
+        opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__color[data-pressed] {
+    box-shadow:
+        0 0 0 2px var(--hh-air-blue-deep),
+        0 0 0 4px var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-shop-gift__color:disabled {
+    cursor: default;
+    opacity: 0.35;
+}
+
+/* ---------------------------------------------------------------- HC benefits */
+
+:root[data-handheld] .octane-handheld-shop-vip__art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-blue-header);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-shop-vip__header {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+}
+
+:root[data-handheld] .octane-handheld-shop-vip__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-shop-vip__intro {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-shop-vip__teaser {
+    flex: none;
+    max-width: 96px;
+    height: auto;
+}
+
+:root[data-handheld] .octane-handheld-shop-vip__html,
+:root[data-handheld] .octane-handheld-shop-offer__html {
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-shop-vip__html.is-details {
+    color: var(--hh-air-text-muted);
+}
+
+/* ---------------------------------------------------------------- targeted offer */
+
+:root[data-handheld] .octane-handheld-shop-offer__art {
+    height: 200px;
+    border-radius: var(--hh-radius-m);
+    background-color: var(--hh-air-track-tip);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    box-shadow: var(--hh-shadow-card);
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-offer__art {
+    height: 240px;
+}
+
+:root[data-handheld] .octane-handheld-shop-offer__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+}
+
+/* The time left: a red pill, as AIR marks it. */
+:root[data-handheld] .octane-handheld-shop-offer__time {
+    align-self: flex-start;
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-shop-offer__quantity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+}
+
+/* ---------------------------------------------------------------- special items */
+
+:root[data-handheld] .octane-handheld-shop-special__text {
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    white-space: pre-line;
+}
+
+:root[data-handheld] .octane-handheld-shop-special__intro {
+    align-items: center;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-shop-special__show {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+}
+
+/* The showcase: the desktop's platform and spotlight at their own size on a dark stage, the light falling from its top. */
+:root[data-handheld] .octane-handheld-shop-special__stage {
+    --octane-special-items-platform: url("../../assets/images/catalog/air/special-items/special_items_item_platform.png");
+    --octane-special-items-spotlight: url("../../assets/images/catalog/air/special-items/special_items_spotlight1.png");
+    --octane-special-items-spotlight-base: url("../../assets/images/catalog/air/special-items/special_items_spotlight2.png");
+
+    position: relative;
+    height: 236px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    background: linear-gradient(180deg, var(--hh-air-hud-900) 0%, var(--hh-air-hud-700) 100%);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__stage .octane-special-items-viewer {
+    top: 32px;
+    left: 50%;
+    translate: -50% 0;
+}
+
+:root[data-handheld] .octane-handheld-shop-special__stage .octane-special-items-viewer * {
+    box-sizing: border-box;
+}
+
+:root[data-handheld] .octane-handheld-shop-special__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 300;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    translate: 0 -50%;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__nav:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__nav.is-previous {
+    left: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__nav.is-next {
+    right: var(--hh-space-2);
+}
+
+/* A dot per item; the finger gets 36 x 44 around each. */
+:root[data-handheld] .octane-handheld-shop-special__dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+:root[data-handheld] .octane-handheld-shop-special__dot {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-shop-special__dot::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    box-shadow: inset 0 0 0 1px var(--hh-air-border);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__dot[data-pressed]::before {
+    background: var(--hh-air-blue);
+    box-shadow: 0 0 0 2px var(--hh-air-select-outer);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__plaque-row {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__icon {
+    display: flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-shop-special__plaque-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+/* On its side the showcase stands at the left, the set's text and the plaque at the right. */
+:root[data-handheld='landscape'] .octane-handheld-shop-special .octane-handheld-shop-sheet__scroll {
+    grid-template-rows: auto 1fr;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-special .octane-handheld-shop-special__show {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-special :is(.octane-handheld-shop-special__intro, .octane-handheld-shop-special__plaque) {
+    grid-column: 2;
+}
+
+/* ---------------------------------------------------------------- cursed dragon adoption */
+
+/* The story on the cave's art, darkened so the white text reads. */
+:root[data-handheld] .octane-handheld-shop-dragon__story {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-height: 150px;
+    padding: var(--hh-space-4) 88px var(--hh-space-4) var(--hh-space-4);
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    background:
+        linear-gradient(90deg, var(--hh-air-hud-solid) 0%, var(--hh-air-hud) 60%, transparent 100%),
+        url("../../assets/images/cursed-dragon-adoption/background.png") center / cover no-repeat;
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__eyebrow {
+    color: var(--hh-air-count-yellow);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__title {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__body {
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__frank {
+    position: absolute;
+    right: var(--hh-space-3);
+    bottom: 0;
+    width: 66px;
+    height: 170px;
+    background: url("../../assets/images/cursed-dragon-adoption/evil_frank.png") no-repeat 0 0 / 66px 170px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    opacity: 0.8;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__pick {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__choices {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__choice {
+    align-items: center;
+    overflow: hidden;
+    padding: 0 0 var(--hh-space-3);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__choice.is-blue {
+    background: linear-gradient(180deg, var(--hh-air-track-medium) 0%, var(--hh-air-white) 70%);
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__choice.is-purple {
+    background: linear-gradient(180deg, var(--hh-air-track-premium) 0%, var(--hh-air-white) 70%);
+}
+
+/* The crate at twice its size; the dragon's feet 36 px below the crate's top, as on the desktop. */
+:root[data-handheld] .octane-handheld-shop-dragon__crate {
+    position: relative;
+    width: 100%;
+    height: 230px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__package {
+    position: absolute;
+    bottom: var(--hh-space-1);
+    left: 50%;
+    width: 136px;
+    height: 150px;
+    background: no-repeat 0 0 / 136px 150px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    translate: -50% 0;
+}
+
+:root[data-handheld] .is-blue .octane-handheld-shop-dragon__package {
+    background-image: url("../../assets/images/cursed-dragon-adoption/blue_package.png");
+}
+
+:root[data-handheld] .is-purple .octane-handheld-shop-dragon__package {
+    background-image: url("../../assets/images/cursed-dragon-adoption/purple_package.png");
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__pet {
+    position: absolute;
+    bottom: calc(var(--hh-space-1) + 114px);
+    left: 50%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: 160px;
+    pointer-events: none;
+    translate: -50% 0;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__pet > * {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dragon__crate {
+    height: 214px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dragon__package {
+    bottom: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-shop-dragon__pet {
+    bottom: 114px;
+}
+
+/* On its side the story already asks for the choice: the hint makes room for the crates. */
+:root[data-handheld='landscape'] .octane-handheld-shop-dragon__pick > .octane-handheld-shop-sheet__label {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__name {
+    padding: 0 var(--hh-space-2);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-shop-dragon__choice .octane-handheld-shop-dialog__button {
+    flex: none;
+    width: calc(100% - 2 * var(--hh-space-3));
+}
+
+/* ================================================================ the staff catalogue manager */
+
+/* Staff only: the desktop editor as a full-screen sheet whose content scrolls, with phone-sized fields and buttons. */
+:root[data-handheld] .octane-card-shell.octane-catalog-admin-manager {
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-catalog-admin-manager .octane-catalog-admin-manager-body {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld] .octane-catalog-admin-manager .octane-catalog-admin-panel {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-catalog-admin-manager :is(input, textarea, .octane-select-trigger) {
+    font-size: var(--hh-size-field) !important;
+}
+
+:root[data-handheld] .octane-catalog-admin-manager button {
+    min-height: 36px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}

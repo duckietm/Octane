@@ -48,6 +48,8 @@ import {
 import { Checkbox } from '../../../../common/Checkbox';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldCatalogGiftView } from './HandheldCatalogGiftView';
 
 interface GiftPaletteColor {
     id: number;
@@ -85,6 +87,7 @@ export const CatalogGiftView: FC = () => {
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const sessionDataManager = GetSessionDataManager();
     const isModerator = HasSessionPermission('acc_gift_hide_sender', SecurityLevel.MODERATOR);
+    const isHandheld = useIsHandheld();
 
     const allFriends = useMemo(() => friends.filter((friend: MessengerFriend) => friend.id !== -1), [friends]);
 
@@ -152,11 +155,12 @@ export const CatalogGiftView: FC = () => {
     }, [giftConfiguration, initializationSequence, isVisible]);
 
     useEffect(() => {
-        if (!isVisible || defaultStuffType === null) return;
+        // A phone would open its keyboard over the wrapping at once; there the fields are focused by a tap.
+        if (!isVisible || defaultStuffType === null || isHandheld) return;
 
         if (shouldFocusMessageRef.current) messageInputRef.current?.focus();
         else recipientInputRef.current?.focus();
-    }, [defaultStuffType, initializationSequence, isVisible]);
+    }, [defaultStuffType, initializationSequence, isHandheld, isVisible]);
 
     const selectedBoxType = boxTypes[selectedBoxIndex] ?? 0;
     const selectedRibbonType = giftConfiguration?.ribbonTypes[selectedRibbonIndex] ?? giftConfiguration?.ribbonTypes[0] ?? 0;
@@ -215,6 +219,14 @@ export const CatalogGiftView: FC = () => {
         },
         [allFriends]
     );
+
+    // A phone has no arrow keys: a tap into the empty field lists the friends, as ArrowDown does on the desktop.
+    const showReceiverSuggestions = useCallback(() => {
+        const nextSuggestions = receiverName.length ? filterGiftRecipients(allFriends, receiverName) : allFriends.slice(0, 10);
+
+        setSuggestions(nextSuggestions);
+        setIsAutocompleteVisible(nextSuggestions.length > 0);
+    }, [allFriends, receiverName]);
 
     const onReceiverKeyDown = useCallback(
         (event: KeyboardEvent<HTMLInputElement>) => {
@@ -471,6 +483,82 @@ export const CatalogGiftView: FC = () => {
     // showGiftDialog() never gates the customizer on isWrappingEnabled. Once
     // usable wrapper data exists, the second stage of the gift flow opens.
     if (!isVisible || !giftConfiguration || !boxTypes.length) return null;
+
+    if (isHandheld)
+        return (
+            <HandheldCatalogGiftView
+                box={{
+                    label: LocalizeText('catalog.gift_wrapping.pick_box'),
+                    name: LocalizeText(boxName),
+                    price: LocalizeText(priceText, ['price'], [giftConfiguration.price.toString()]),
+                    paid: !isDefaultBox,
+                    onPrevious: () => selectRelativeBox(-1),
+                    onNext: () => selectRelativeBox(1)
+                }}
+                cancelLabel={LocalizeText('catalog.gift_wrapping.cancel')}
+                colors={{
+                    title: LocalizeText('catalog.gift_wrapping.pick_color'),
+                    items: colors,
+                    selectedId: selectedColorId,
+                    enabled: isColorEnabled,
+                    onPick: (id) => {
+                        setIsAutocompleteVisible(false);
+                        setSelectedColorId(id);
+                    }
+                }}
+                giveLabel={LocalizeText('catalog.gift_wrapping.give_gift')}
+                isBuying={isBuyingGift}
+                message={{
+                    placeholder: LocalizeText('catalog.gift_wrapping_new.message_hint'),
+                    value: message,
+                    inputRef: messageInputRef,
+                    onChange: (event) => setMessage(limitGiftMessageToTextarea(event.target.value, event.target)),
+                    onFocus: () => setIsAutocompleteVisible(false)
+                }}
+                preview={
+                    giftSelection.wrapperId > 0 ? (
+                        <LayoutFurniImageView
+                            direction={180}
+                            extraData={giftSelection.previewExtraData}
+                            productClassId={giftSelection.wrapperId}
+                            productType={ProductTypeEnum.FLOOR}
+                        />
+                    ) : null
+                }
+                recipient={{
+                    placeholder: LocalizeText('catalog.gift_wrapping_new.name_hint'),
+                    value: receiverName,
+                    inputRef: recipientInputRef,
+                    suggestions: isAutocompleteVisible ? suggestions.map((friend) => friend.name) : [],
+                    renderName: renderSuggestionName,
+                    onChange: onReceiverChanged,
+                    onFocus: showReceiverSuggestions,
+                    onPick: selectReceiverName,
+                    onDismiss: () => setIsAutocompleteVisible(false)
+                }}
+                ribbon={{
+                    label: LocalizeText('catalog.gift_wrapping.pick_ribbon'),
+                    name: LocalizeText(ribbonName),
+                    enabled: isRibbonEnabled,
+                    onPrevious: () => selectRelativeRibbon(-1),
+                    onNext: () => selectRelativeRibbon(1)
+                }}
+                sender={{
+                    picture: showPurchaserIdentity ? (
+                        <LayoutAvatarImageView headOnly direction={2} figure={sessionDataManager.figure} nativeCroppedHead />
+                    ) : (
+                        <img alt="" draggable={false} src={giftIncognitoImage} />
+                    ),
+                    signature: showPurchaserIdentity ? LocalizeText('catalog.gift_wrapping_new.message_from', ['name'], [sessionDataManager.userName]) : null,
+                    showFace: isModerator
+                        ? { label: LocalizeText('catalog.gift_wrapping.show_face.title'), checked: showMyFace, onChange: setShowMyFace }
+                        : null
+                }}
+                title={LocalizeText('catalog.gift_wrapping.title')}
+                onClose={onClose}
+                onGive={onBuyGift}
+            />
+        );
 
     return (
         <NativeTextTree>

@@ -1,0 +1,1036 @@
+/*
+ * Phone inventory and trading dialogs and a few small room windows, in the Octane handheld look (HandheldTokens.css).
+ * Scoped to :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so the desktop
+ * windows stay as they are.
+ *   - .octane-handheld-invdlg: the centred cards of the furni delete (HandheldInventoryFurnitureDeleteView) and the
+ *     trade name-scam warning (HandheldInventoryTradeNameScamWarningView). DraggableWindow centres them above the
+ *     toolbar strip; on its side they use the width in two columns so they stay low.
+ *   - .chat-input-mention-popover.is-handheld: the @mention list above the chat composer and the keyboard.
+ *   - .octane-handheld-chatwin: the chat window (the "chat in a window" setting) at the top of the room.
+ *   - .octane-handheld-ads: the sponsored card.
+ */
+
+/* ---------------------------------------------------------------- the card */
+
+:root[data-handheld] .octane-handheld-invdlg {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: min(360px, calc(100vw - 24px - var(--octane-safe-left, 0px) - var(--octane-safe-right, 0px)));
+    max-height: calc(100vh - var(--octane-handheld-toolbar, 60px) - 24px - var(--octane-safe-top, 0px) - var(--octane-safe-bottom, 0px));
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    /* The room and the sheet under the card are dimmed, so the question stands out. */
+    box-shadow:
+        var(--hh-shadow-float),
+        0 0 0 100vmax rgba(0, 0, 0, 0.42);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg :where(img, canvas) {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-invdlg :where(button):focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 52px;
+    padding: var(--hh-space-1) var(--hh-space-2) var(--hh-space-1) var(--hh-space-3);
+    border-bottom: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__badge {
+    display: flex;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--hh-radius-pill);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__badge.is-danger {
+    background: var(--hh-dismiss);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__badge.is-warning {
+    background: var(--hh-air-count-yellow);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__badge svg,
+:root[data-handheld] .octane-handheld-invdlg__close svg,
+:root[data-handheld] .octane-handheld-invdlg__step svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__badge circle {
+    fill: currentColor;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__title {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 19px;
+}
+
+/* 36 px to the eye, 44 px to the finger. */
+:root[data-handheld] .octane-handheld-invdlg__close {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__close::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__close:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__close:disabled {
+    cursor: default;
+    opacity: 0.4;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__item,
+:root[data-handheld] .octane-handheld-invdlg__trader {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    padding: var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__picture {
+    display: flex;
+    flex: 0 0 72px;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__picture > * {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__head-picture {
+    position: relative;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 56px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__item-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__name {
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__muted {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__label {
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__text,
+:root[data-handheld] .octane-handheld-invdlg__note {
+    margin: 0;
+    font-size: var(--hh-size-m);
+    line-height: 19px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__note {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 17px;
+}
+
+/* ---------------------------------------------------------------- amount */
+
+:root[data-handheld] .octane-handheld-invdlg__amount {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__step {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__step svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.2px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__step:active,
+:root[data-handheld] .octane-handheld-invdlg__max:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__stepper .octane-number-field {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* 16 px, so the phone does not zoom into the field. */
+:root[data-handheld] .octane-handheld-invdlg__stepper input.octane-number-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 48px;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-field);
+    font-weight: 700;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__stepper input.octane-number-input:focus {
+    border-color: var(--hh-air-blue-deep);
+    outline: none;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__max {
+    flex: none;
+    box-sizing: border-box;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-cream);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__step:disabled,
+:root[data-handheld] .octane-handheld-invdlg__max:disabled {
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.4;
+}
+
+/* ---------------------------------------------------------------- look-alike names */
+
+:root[data-handheld] .octane-handheld-invdlg__names {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__chip {
+    max-width: 100%;
+    overflow: hidden;
+    padding: 5px var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- actions */
+
+:root[data-handheld] .octane-handheld-invdlg__actions {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__actions.is-stacked {
+    flex-direction: column;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button.is-compact {
+    flex: none;
+    padding: 0 var(--hh-space-3);
+    font-size: var(--hh-size-m);
+}
+
+/* The way back is the prominent one: a solid white pill in the window blue. */
+:root[data-handheld] .octane-handheld-invdlg__button.is-secondary {
+    background: var(--hh-air-white);
+    box-shadow:
+        inset 0 0 0 1px var(--hh-air-blue-deep),
+        var(--hh-shadow-card);
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button.is-secondary:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button.is-primary {
+    border: 1px solid var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button.is-danger {
+    border: 1px solid var(--hh-air-red-deep);
+    background: var(--hh-dismiss);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__button:disabled {
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.45;
+}
+
+/* The countdown before the warning may be closed: a line and a bar that runs out. */
+:root[data-handheld] .octane-handheld-invdlg__lock {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__lock-bar {
+    position: relative;
+    height: 4px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-invdlg__lock-bar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--hh-air-count-yellow);
+    transform: scaleX(var(--hh-fill, 0));
+    transform-origin: left center;
+    transition: transform var(--hh-fast) linear;
+}
+
+/* Upright the body is one column: the main part, the side part (amount, look-alike names), then the note. */
+:root[data-handheld='portrait'] .octane-handheld-invdlg__main {
+    display: contents;
+}
+
+:root[data-handheld='portrait'] .octane-handheld-invdlg__note {
+    order: 1;
+}
+
+:root[data-handheld] .octane-handheld-invdlg__side {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+}
+
+/* ---------------------------------------------------------------- on its side: two columns */
+
+/* The main part at the left; the side part and the buttons at the right, so the card stays low. */
+:root[data-handheld='landscape'] .octane-handheld-invdlg {
+    display: grid;
+    grid-template-areas:
+        "head head"
+        "main side"
+        "main actions";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    width: min(620px, calc(100vw - 24px - var(--octane-safe-left, 0px) - var(--octane-safe-right, 0px)));
+}
+
+:root[data-handheld='landscape'] .octane-handheld-invdlg__head {
+    grid-area: head;
+    min-height: 48px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-invdlg__body {
+    display: contents;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-invdlg__main {
+    display: flex;
+    grid-area: main;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-invdlg__side {
+    grid-area: side;
+    gap: var(--hh-space-2);
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-left: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-invdlg__actions {
+    grid-area: actions;
+    flex-direction: column;
+    padding: var(--hh-space-3);
+    border-top: 0;
+    border-left: 1px solid var(--hh-air-box);
+}
+
+/* Without a side part the buttons take the whole right column, at its foot. */
+:root[data-handheld='landscape'] .octane-handheld-invdlg:not(:has(.octane-handheld-invdlg__side)) .octane-handheld-invdlg__actions {
+    grid-row: 2 / 4;
+    justify-content: flex-end;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-invdlg__actions > .octane-handheld-invdlg__button {
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- @mention list above the composer */
+
+:root[data-handheld] .octane-handheld-composer .chat-input-mention-popover.is-handheld {
+    bottom: calc(100% + 8px);
+    margin-bottom: 4px;
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud-solid);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font);
+    image-rendering: auto;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-popover-header {
+    height: auto;
+    padding: var(--hh-space-2) var(--hh-space-3) 2px;
+    border: 0;
+    background: transparent;
+    color: var(--hh-on-dark-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0;
+    text-shadow: none;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-popover-header-dot {
+    display: none;
+}
+
+/* Up to five rows, never more than what is left above the composer (and the keyboard); two rows at least. */
+:root[data-handheld] .octane-handheld-composer .chat-input-mention-popover.is-handheld .chat-input-mention-popover-list {
+    gap: 2px;
+    max-height: max(96px, min(236px, calc(100vh - var(--octane-keyboard-inset, 0px) - 176px - var(--octane-safe-top, 0px))));
+    padding: var(--hh-space-1);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row {
+    flex: none;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: transparent;
+    box-shadow: none;
+    color: var(--hh-on-dark);
+    text-shadow: none;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row:hover {
+    background: transparent;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected,
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row-tile {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: inset 0 0 0 1px var(--hh-hairline);
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected .chat-input-mention-row-tile {
+    background: var(--hh-well);
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row-tile.is-alias,
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected .chat-input-mention-row-tile.is-alias {
+    background: var(--hh-air-count-yellow);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    text-shadow: none;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row-name,
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected .chat-input-mention-row-name {
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    line-height: 19px;
+    letter-spacing: 0;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row-desc,
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected .chat-input-mention-row-desc {
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row-kind,
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected .chat-input-mention-row-kind {
+    padding: 3px var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: none;
+    color: var(--hh-on-dark-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    line-height: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row-kind.is-alias,
+:root[data-handheld] .chat-input-mention-popover.is-handheld .chat-input-mention-row.is-selected .chat-input-mention-row-kind.is-alias {
+    background: var(--hh-air-count-yellow);
+    color: var(--hh-air-text);
+}
+
+/* ---------------------------------------------------------------- chat window */
+
+/* Under the room chip at the top, ending above the composer; the keyboard pushes its end up. */
+:root[data-handheld] .octane-handheld-chatwin {
+    position: fixed;
+    top: calc(var(--octane-safe-top, 0px) + 60px);
+    right: calc(var(--octane-safe-right, 0px) + var(--hh-space-2));
+    left: calc(var(--octane-safe-left, 0px) + var(--hh-space-2));
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: min(300px, calc(100vh - var(--octane-safe-top, 0px) - var(--octane-safe-bottom, 0px) - 60px - var(--octane-handheld-toolbar, 60px) - 8px));
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    pointer-events: auto;
+}
+
+/* The composer is open (it is taller than the toolbar strip): the panel ends above it. */
+:root[data-handheld]:has(.tb-frame[data-handheld-chat]) .octane-handheld-chatwin {
+    height: min(300px, calc(100vh - var(--octane-safe-top, 0px) - var(--octane-safe-bottom, 0px) - 60px - 116px));
+}
+
+/* The keyboard is open: the composer sits on it, the panel ends above both (at least its header stays). */
+:root[data-handheld][data-handheld-keyboard]:root .octane-handheld-chatwin {
+    height: max(44px, min(300px, calc(100vh - var(--octane-keyboard-inset, 0px) - var(--octane-safe-top, 0px) - 60px - 116px)));
+}
+
+/* On its side a column at the left, so the room stays in view at the right. */
+:root[data-handheld='landscape'] .octane-handheld-chatwin {
+    right: auto;
+    width: min(420px, calc(50vw - var(--octane-safe-left, 0px)));
+}
+
+:root[data-handheld] .octane-handheld-chatwin__head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 44px;
+    padding: 0 var(--hh-space-1) 0 var(--hh-space-3);
+    background: var(--hh-air-blue-header);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-chatwin__title {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 19px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 36 px round buttons, 44 px to the finger: the whole header height. */
+:root[data-handheld] .octane-handheld-chatwin__icon {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-chatwin__icon::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__icon:active,
+:root[data-handheld] .octane-handheld-chatwin__icon[aria-pressed='true'] {
+    background: var(--hh-well-pressed);
+}
+
+/* A filter is on: a dot on the filters button. */
+:root[data-handheld] .octane-handheld-chatwin__icon.is-filtering::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-chatwin__icon svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__icon:focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 1px;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__filters {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2);
+    border-bottom: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] input.octane-handheld-chatwin__search {
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+}
+
+:root[data-handheld] input.octane-handheld-chatwin__search:focus {
+    border-color: var(--hh-air-blue-deep);
+    outline: none;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__check,
+:root[data-handheld] .octane-handheld-chatwin__chip {
+    display: inline-flex;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-height: 36px;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-chatwin__chip:active,
+:root[data-handheld] .octane-handheld-chatwin__check:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-chatwin__filters {
+    flex-flow: row wrap;
+}
+
+:root[data-handheld='landscape'] input.octane-handheld-chatwin__search {
+    flex: 1 1 160px;
+    width: auto;
+    height: 36px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-chatwin__chips {
+    display: contents;
+}
+
+:root[data-handheld='landscape'] :is(.octane-handheld-chatwin__check, .octane-handheld-chatwin__chip) {
+    flex: 0 1 auto;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__chip.is-danger {
+    color: var(--hh-air-red-deep);
+}
+
+:root[data-handheld] .octane-handheld-chatwin__body {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__list {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    padding: var(--hh-space-2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-chatwin__latest {
+    position: absolute;
+    right: 50%;
+    bottom: var(--hh-space-2);
+    min-height: 36px;
+    padding: 0 var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud-solid);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    transform: translateX(50%);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-chatwin__latest::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+/* ---------------------------------------------------------------- sponsored card */
+
+:root[data-handheld] .octane-handheld-ads {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    box-sizing: border-box;
+    padding: 0 var(--hh-space-2) var(--hh-space-2);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+}
+
+:root[data-handheld] .octane-handheld-ads__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    height: var(--hh-touch);
+    padding-left: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-ads__label {
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    line-height: 16px;
+    text-transform: uppercase;
+}
+
+/* A real 44 px button, at the top right where a thumb finds it. */
+:root[data-handheld] .octane-handheld-ads__close {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin-right: calc(var(--hh-space-1) * -1);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-ads__close svg {
+    width: 30px;
+    height: 30px;
+    padding: 7px;
+    box-sizing: border-box;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-ads__close:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-ads__close:focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: -2px;
+}
+
+/* The ad's box stays at its real 300 x 250. */
+:root[data-handheld] .octane-handheld-ads__slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 250px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+/* On its side the label and close stand beside the ad, so the card is just the ad high. */
+:root[data-handheld='landscape'] .octane-handheld-ads {
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    padding: var(--hh-space-2) var(--hh-space-1) var(--hh-space-2) var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-ads__head {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    height: 250px;
+    padding-left: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-ads__close {
+    margin-right: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-ads__label {
+    writing-mode: vertical-rl;
+}

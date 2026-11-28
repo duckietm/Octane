@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 
 import { AddLinkEventTracker, GetSessionDataManager } from '@octane/renderer';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatEntryType, IChatEntry } from '../../api';
 import { DESKTOP_LAYOUT } from '../../api/handheld/handheldLayout';
@@ -136,9 +136,37 @@ describe('ChatHistoryView ignore cross', () => {
 });
 
 describe('ChatHistoryView in the phone layout', () => {
+    const ignoreUser = vi.fn();
+    const chatLine = (id: number, webId: number, name: string, message: string, timestamp = '16:18'): IChatEntry =>
+        roomInfoEntry({
+            id,
+            webId,
+            entityId: webId,
+            name,
+            message,
+            style: 0,
+            chatType: 0,
+            imageUrl: 'data:image/png;base64,AA==',
+            timestamp,
+            type: ChatEntryType.TYPE_CHAT
+        });
+    const history = (): IChatEntry[] => [
+        roomInfoEntry({ id: 1, name: 'Lobby', roomId: 1, timestamp: '16:17' }),
+        chatLine(2, 7, 'dennis', 'hallo daar'),
+        chatLine(3, 1, 'me', 'hoi'),
+        roomInfoEntry({ id: 4, name: 'Soundboard', message: 'dennis played Bell', roomId: 1, timestamp: '16:19' }),
+        roomInfoEntry({ id: 5, name: 'Pool', roomId: 2, timestamp: '16:20' }),
+        chatLine(6, 9, 'mia', 'splash', '16:21')
+    ];
+    const asPhone = (orientation: 'portrait' | 'landscape') => act(() => useHandheldStore.setState({ layout: { active: true, orientation } }));
+
     beforeEach(() => {
         vi.mocked(AddLinkEventTracker).mockClear();
+        showConfirm.mockClear();
+        ignoreUser.mockClear();
+        ignored.ids = [];
         HTMLElement.prototype.scrollTo = vi.fn();
+        vi.mocked(GetSessionDataManager).mockReturnValue({ userId: 1, ignoreUser } as never);
     });
 
     afterEach(() => {
@@ -146,23 +174,96 @@ describe('ChatHistoryView in the phone layout', () => {
         act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT, keyboardInset: 0 }));
     });
 
-    it('names its close handle and keeps the latest line in view when the keyboard opens', () => {
-        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
-        renderVisibleHistory([roomInfoEntry({ name: 'Sala da pranzo' })]);
+    it('draws a sheet with one section per room visit, the room event inside it and the live bubbles', () => {
+        asPhone('portrait');
+        renderVisibleHistory(history());
 
-        expect(screen.getByRole('button', { name: 'Close chat history' })).toBeInTheDocument();
+        expect(document.querySelector('.octane-handheld-chat-history .octane-handheld-sheet')).not.toBeNull();
+        expect(document.querySelector('.octane-chat-history')).toBeNull();
 
-        const scrolls = vi.mocked(HTMLElement.prototype.scrollTo).mock.calls.length;
+        const sections = screen.getAllByRole('region');
+
+        expect(sections.map((section) => section.getAttribute('aria-label'))).toEqual(['Lobby', 'Pool']);
+        expect(sections[0]).toHaveTextContent('dennis played Bell');
+        expect(screen.getByText('hallo daar').closest('.bubble-container').className).toContain('octane-chat-history-bubble');
+        // No room column upright.
+        expect(screen.queryByRole('navigation')).toBeNull();
+    });
+
+    it('scrolls to the newest line on open and again when the keyboard opens', () => {
+        asPhone('portrait');
+        renderVisibleHistory(history());
+
+        const scrollTo = vi.mocked(HTMLElement.prototype.scrollTo);
+
+        expect(scrollTo).toHaveBeenCalled();
+        expect(scrollTo.mock.contexts.at(-1)).toBe(screen.getByTestId('chat-history-list'));
+
+        const scrolls = scrollTo.mock.calls.length;
 
         act(() => useHandheldStore.setState({ keyboardInset: 320 }));
 
-        expect(vi.mocked(HTMLElement.prototype.scrollTo).mock.calls.length).toBeGreaterThan(scrolls);
+        expect(scrollTo.mock.calls.length).toBeGreaterThan(scrolls);
     });
 
-    it('leaves the desktop handle without a label', () => {
-        renderVisibleHistory([roomInfoEntry({ name: 'Sala da pranzo' })]);
+    it('offers ignore on the same lines as the desktop and asks before ignoring', () => {
+        ignored.ids = [9];
+        asPhone('portrait');
+        renderVisibleHistory(history());
 
-        expect(screen.queryByRole('button', { name: 'Close chat history' })).not.toBeInTheDocument();
+        const buttons = document.querySelectorAll('.octane-handheld-chat-history__ignore');
+
+        expect(buttons).toHaveLength(1);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Ignore user: dennis' }));
+
+        expect(showConfirm).toHaveBeenCalledTimes(1);
+        expect(ignoreUser).not.toHaveBeenCalled();
+
+        showConfirm.mock.calls[0][1]();
+
+        expect(ignoreUser).toHaveBeenCalledWith(7);
+    });
+
+    it('closes from the sheet header like the desktop handle', () => {
+        asPhone('portrait');
+        renderVisibleHistory(history());
+
+        fireEvent.click(document.querySelector('.octane-handheld-sheet__caption-button.is-close'));
+
+        expect(document.querySelector('.octane-handheld-chat-history')).toBeNull();
+    });
+
+    it('lists the rooms at the side on a flat phone, and a room scrolls its section into view', () => {
+        asPhone('landscape');
+        renderVisibleHistory(history());
+
+        const rooms = screen.getByRole('navigation', { name: 'Rooms' });
+        const pool = within(rooms).getByRole('button', { name: /Pool/ });
+
+        expect(within(rooms).getAllByRole('button')).toHaveLength(2);
+        expect(pool).toHaveAttribute('aria-current', 'location');
+
+        vi.mocked(HTMLElement.prototype.scrollTo).mockClear();
+        fireEvent.click(within(rooms).getByRole('button', { name: /Lobby/ }));
+
+        expect(HTMLElement.prototype.scrollTo).toHaveBeenCalledWith({ top: expect.any(Number) });
+        expect(within(rooms).getByRole('button', { name: /Lobby/ })).toHaveAttribute('aria-current', 'location');
+    });
+
+    it('says so when nothing has been said yet', () => {
+        asPhone('portrait');
+        renderVisibleHistory([]);
+
+        expect(screen.getByText('Nothing has been said yet.')).toBeInTheDocument();
+    });
+
+    it('leaves the desktop panel and its unlabelled handle as they were', () => {
+        renderVisibleHistory(history());
+
+        expect(document.querySelector('.octane-handheld-chat-history')).toBeNull();
+        expect(document.querySelector('.octane-chat-history-scroll')).not.toBeNull();
         expect(document.querySelector('.octane-chat-history-handle')?.hasAttribute('aria-label')).toBe(false);
+        expect(document.querySelectorAll('.octane-chat-history-room-info')).toHaveLength(3);
     });
 });

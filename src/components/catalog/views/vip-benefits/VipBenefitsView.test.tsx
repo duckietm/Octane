@@ -33,6 +33,13 @@ vi.mock('../../../../common', async (importOriginal) => {
     };
 });
 
+vi.mock('../../../../common/draggable-window', async (importOriginal) => ({
+    ...(await importOriginal<Record<string, unknown>>()),
+    DraggableWindow: ({ children, handheldSheet }: PropsWithChildren<{ handheldSheet?: boolean }>) => <div data-sheet={String(!!handheldSheet)}>{children}</div>
+}));
+
+import { DESKTOP_LAYOUT } from '../../../../api/handheld/handheldLayout';
+import { useHandheldStore } from '../../../../state/handheldStore';
 import { VipRequiredView } from '../../../room/widgets/furniture/context-menu/VipRequiredView';
 import { VipBenefitsView } from './VipBenefitsView';
 
@@ -62,6 +69,27 @@ describe('VipBenefitsView', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'close' }));
         expect(screen.queryByTestId('vip-benefits-title')).toBeNull();
+    });
+
+    it('opens as a phone sheet with the same images and texts, and closes from its bar', () => {
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
+
+        try {
+            render(<VipBenefitsView />);
+            act(() => tracker().linkReceived('vip-benefits/show'));
+
+            expect(screen.getByTestId('handheld-vip-benefits')).toBeTruthy();
+            expect(screen.queryByTestId('vip-benefits-title')).toBeNull();
+            expect(screen.getByTestId('handheld-vip-benefits-title').textContent).toBe('Be in the spotlight!');
+            const sources = Array.from(document.querySelectorAll('img')).map((image) => image.getAttribute('src'));
+            expect(sources).toContain('https://images/c_images/directVipBuy/hc_benefits_header.png');
+            expect(sources).toContain('https://images/c_images/directVipBuy/hc_benefits_teaser.png');
+
+            fireEvent.click(screen.getByTestId('handheld-vip-benefits-close'));
+            expect(screen.queryByTestId('handheld-vip-benefits')).toBeNull();
+        } finally {
+            act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT }));
+        }
     });
 });
 

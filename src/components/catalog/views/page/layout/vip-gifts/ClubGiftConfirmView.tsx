@@ -5,6 +5,8 @@ import { LayoutImage, OctaneCardContentView, OctaneCardHeaderView, OctaneCardVie
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { InlineDialog } from '../../../../../../common/InlineDialog';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../../../hooks/handheld/useHandheldLayout';
+import { HandheldClubGiftConfirmView } from '../../../handheld/HandheldShopConfirmViews';
 import { getClubGiftFurniText } from './clubGifts.helpers';
 import { getGiftFurniData } from './VipGiftItemView';
 
@@ -24,6 +26,10 @@ export const ClubGiftConfirmView: FC<ClubGiftConfirmViewProps> = (props) => {
     const imageUrl = product ? ProductImageUtility.getProductImageUrl(product.productType, product.furniClassId, product.extraParam) : '';
     const name = getClubGiftFurniText(getGiftFurniData(offer), 'name', (key) => LocalizeText(key));
     const title = LocalizeText('catalog.club_gift.confirm');
+    const isHandheld = useIsHandheld();
+
+    if (isHandheld)
+        return <HandheldClubGiftConfirmView name={name} picture={<LayoutImage imageUrl={imageUrl} />} title={title} onCancel={onCancel} onConfirm={onConfirm} />;
 
     return (
         <NativeTextTree>

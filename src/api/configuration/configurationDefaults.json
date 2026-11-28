@@ -115,6 +115,7 @@
     "room.zoom.enabled": true,
     "room.planes.direct": false,
     "room.color.skip.transition": false,
+    "room.avatar.redraw.budget": true,
     "room.camera.follow_user": true,
     "room.camera.move.speed": 12,
     "landing.view.roomcategory": "random_friending_room",

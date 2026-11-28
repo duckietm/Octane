@@ -11,8 +11,6 @@
     // A second name for the same value can be deliberate (WIRED_CMP_DEFAULT is WIRED_CMP_GREATER_EQUAL): reported, not failing.
     "rules": { "duplicates": "warn" },
     "ignoreDependencies": [
-        // Resolved through the tsconfig/Vite aliases from the sibling renderer checkout, not from package.json.
-        "pixi.js",
         // Type-only JSDoc import in postcss.config.js; the package comes with postcss tooling.
         "postcss-load-config",
         // scripts/catalog-stats.mjs is an optional local maintenance script run against the hotel database.

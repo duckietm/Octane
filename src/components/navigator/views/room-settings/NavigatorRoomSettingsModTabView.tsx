@@ -10,6 +10,8 @@ import { FC, useEffect, useState } from 'react';
 import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { BaseButton, Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomSettingsModView } from './HandheldRoomSettingsTabs';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 import { Select } from '../../../../common/Select';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -23,6 +25,7 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
     const { roomData = null, handleChange = null } = props;
     const [selectedUserId, setSelectedUserId] = useState<number>(-1);
     const [bannedUsers, setBannedUsers] = useState<BannedUserData[]>([]);
+    const isHandheld = useIsHandheld();
 
     const unBanUser = (userId: number) => {
         setBannedUsers((prevValue) => {
@@ -62,6 +65,8 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
     useEffect(() => {
         SendMessageComposer(new RoomBannedUsersComposer(roomData.roomId));
     }, [roomData.roomId]);
+
+    if (isHandheld) return <HandheldRoomSettingsModView bannedUsers={bannedUsers} handleChange={handleChange} roomData={roomData} onUnban={unBanUser} />;
 
     return (
         <NativeTextTree>

@@ -111,6 +111,9 @@
     // Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.
     "room.color.skip.transition": false,
 
+    // In a crowd, the mouth and eye frames of avatars that stand still take turns instead of slowing the frame down; off: every avatar redraws at once, as before.
+    "room.avatar.redraw.budget": true,
+
     // Pet type names, by type id; used only when pets.json is missing or empty.
     "pet.types": [],
 

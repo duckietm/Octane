@@ -5,6 +5,8 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { configFileUrl } from '../../secure-assets';
 import '../../css/ads/GoogleAdsAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldGoogleAdsView } from './HandheldGoogleAdsView';
 
 interface AdsenseConfig {
     slot: string;
@@ -36,6 +38,7 @@ export const GoogleAdsView: FC<{}> = () => {
     const insRef = useRef<HTMLModElement>(null);
     const pushedRef = useRef(false);
     const autoOpenedRef = useRef(false);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         if (!adsEnabled) return;
@@ -132,44 +135,59 @@ export const GoogleAdsView: FC<{}> = () => {
             : null;
     const framed = !!adsFrameUrl;
 
+    const script = publisherId && !framed && (
+        <script async crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${publisherId}`} />
+    );
+    const slot = (
+        <>
+            {loadError && <div className="text-xs text-red-600 text-center px-2">Ads unavailable: {loadError}</div>}
+            {!loadError && (!publisherId || !config) && <div className="octane-google-ads__hint">{localizeWithFallback('octane.ads.loading', 'Loading…')}</div>}
+            {!loadError && framed && adsFrame && (
+                <iframe
+                    className="w-full h-full border-0"
+                    referrerPolicy="strict-origin"
+                    sandbox={adsFrame.sandbox}
+                    src={adsFrame.src}
+                    title={localizeWithFallback('octane.ads.sponsored', 'Sponsored')}
+                />
+            )}
+            {!loadError && framed && publisherId && config?.slot && !adsFrame && (
+                <div className="text-xs text-red-600 text-center px-2">{localizeWithFallback('octane.ads.ads_unavailable_ads_frame_url_is', 'Ads unavailable: ads.frame.url is not a web URL')}</div>
+            )}
+            {!loadError && !framed && publisherId && config?.slot && (
+                <ins
+                    ref={insRef}
+                    key={`${publisherId}-${config.slot}`}
+                    className="adsbygoogle"
+                    style={{ display: 'block', width: '100%', height: '100%' }}
+                    data-ad-client={`ca-${publisherId}`}
+                    data-ad-slot={config.slot}
+                    data-ad-format={config.format ?? 'auto'}
+                    data-full-width-responsive={(config.fullWidthResponsive ?? true) ? 'true' : 'false'}
+                />
+            )}
+            {!loadError && publisherId && config && !config.slot && (
+                <div className="octane-google-ads__hint text-center px-2">{localizeWithFallback('octane.ads.ad_slot_not_configured_in_configuration', 'Ad slot not configured in configuration/adsense.json')}</div>
+            )}
+        </>
+    );
+
+    // A phone gets a small card with the same box, a 44 px close, placed above the toolbar strip.
+    if (isHandheld)
+        return (
+            <HandheldGoogleAdsView script={script} onClose={() => setIsOpen(false)}>
+                {slot}
+            </HandheldGoogleAdsView>
+        );
+
     return (
         <NativeTextTree>
             <OctaneCardView className="octane-google-ads" uniqueKey="google-ads" theme="primary">
-                {publisherId && !framed && (
-                    <script async crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${publisherId}`} />
-                )}
+                {script}
                 <OctaneCardHeaderView headerText={localizeWithFallback('octane.ads.sponsored', 'Sponsored')} onCloseClick={() => setIsOpen(false)} />
                 <OctaneCardContentView>
                     <div className="flex items-center justify-center w-[300px] h-[250px] bg-white">
-                        {loadError && <div className="text-xs text-red-600 text-center px-2">Ads unavailable: {loadError}</div>}
-                        {!loadError && (!publisherId || !config) && <div className="octane-google-ads__hint">{localizeWithFallback('octane.ads.loading', 'Loading…')}</div>}
-                        {!loadError && framed && adsFrame && (
-                            <iframe
-                                className="w-full h-full border-0"
-                                referrerPolicy="strict-origin"
-                                sandbox={adsFrame.sandbox}
-                                src={adsFrame.src}
-                                title={localizeWithFallback('octane.ads.sponsored', 'Sponsored')}
-                            />
-                        )}
-                        {!loadError && framed && publisherId && config?.slot && !adsFrame && (
-                            <div className="text-xs text-red-600 text-center px-2">{localizeWithFallback('octane.ads.ads_unavailable_ads_frame_url_is', 'Ads unavailable: ads.frame.url is not a web URL')}</div>
-                        )}
-                        {!loadError && !framed && publisherId && config?.slot && (
-                            <ins
-                                ref={insRef}
-                                key={`${publisherId}-${config.slot}`}
-                                className="adsbygoogle"
-                                style={{ display: 'block', width: '100%', height: '100%' }}
-                                data-ad-client={`ca-${publisherId}`}
-                                data-ad-slot={config.slot}
-                                data-ad-format={config.format ?? 'auto'}
-                                data-full-width-responsive={(config.fullWidthResponsive ?? true) ? 'true' : 'false'}
-                            />
-                        )}
-                        {!loadError && publisherId && config && !config.slot && (
-                            <div className="octane-google-ads__hint text-center px-2">{localizeWithFallback('octane.ads.ad_slot_not_configured_in_configuration', 'Ad slot not configured in configuration/adsense.json')}</div>
-                        )}
+                        {slot}
                     </div>
                 </OctaneCardContentView>
             </OctaneCardView>

@@ -5,6 +5,8 @@ import { Button, Column, Flex, Text } from '../../../../common';
 import { Checkbox } from '../../../../common/Checkbox';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Radio } from '../../../../common/Radio';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomSettingsAccessView } from './HandheldRoomSettingsTabs';
 import { NavigatorRoomSettingsFieldErrorView } from './NavigatorRoomSettingsFieldErrorView';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
@@ -19,6 +21,7 @@ export const NavigatorRoomSettingsAccessTabView: FC<NavigatorRoomSettingsTabView
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isTryingPassword, setIsTryingPassword] = useState(false);
+    const isHandheld = useIsHandheld();
 
     const saveRoomPassword = () => {
         if (!isTryingPassword || password.length <= 0 || confirmPassword.length <= 0 || password !== confirmPassword) return;
@@ -34,6 +37,25 @@ export const NavigatorRoomSettingsAccessTabView: FC<NavigatorRoomSettingsTabView
 
     // Habbo covers the door modes with the Builders Club notice while the room is locked; moderators still see them.
     const lockedByBuildersClub = !!roomData.hiddenByBc && !GetSessionDataManager().hasSecurity(4);
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomSettingsAccessView
+                confirmPassword={confirmPassword}
+                errors={errors}
+                handleChange={handleChange}
+                isTryingPassword={isTryingPassword}
+                lockedByBuildersClub={lockedByBuildersClub}
+                password={password}
+                roomData={roomData}
+                saveRoomPassword={saveRoomPassword}
+                onBuildersClubInfo={() => CreateLinkEvent('habbopages/builders-club/faq')}
+                onConfirmPassword={setConfirmPassword}
+                onPassword={setPassword}
+                onTryPassword={() => setIsTryingPassword(true)}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

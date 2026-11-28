@@ -1,0 +1,314 @@
+/*
+ * Phone chat history (room tools > chat history), in the Octane handheld look (HandheldTokens.css) inside the shared frame
+ * (HandheldSheetFrame). HandheldChatHistoryView draws it: a tall sheet over the room that ends above the chat composer (and
+ * above the keyboard while it is open), one section per room visit with the room's name as a sticky header, each line the
+ * room's own chat bubble with its time beside it and "ignore" as a button of its own, and a round button back to the newest
+ * line. On its side the visited rooms are a column at the left. Everything is scoped to :root[data-handheld], which only a
+ * phone-sized touch device gets.
+ */
+
+/* ---------------------------------------------------------------- placement */
+
+:root[data-handheld] .octane-handheld-chat-history {
+    position: fixed;
+    top: calc(var(--octane-safe-top, 0px) + var(--hh-space-2));
+    right: calc(var(--octane-safe-right, 0px) + var(--hh-space-2));
+    bottom: calc(var(--octane-handheld-toolbar) + 60px + var(--octane-safe-bottom, 0px));
+    left: calc(var(--octane-safe-left, 0px) + var(--hh-space-2));
+    z-index: 70;
+    display: flex;
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    box-shadow: var(--hh-shadow-float);
+    pointer-events: auto;
+}
+
+/* The keyboard opened (for the chat composer): the sheet ends right above the composer on top of the keyboard. */
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-chat-history {
+    bottom: calc(var(--octane-keyboard-inset, 0px) + 104px);
+}
+
+/* On its side the sheet leaves the right part of the room in view. */
+:root[data-handheld='landscape'] .octane-handheld-chat-history {
+    right: auto;
+    width: min(720px, calc(100vw - 16px - var(--octane-safe-left, 0px) - var(--octane-safe-right, 0px)));
+}
+
+/* ---------------------------------------------------------------- body */
+
+:root[data-handheld] .octane-handheld-chat-history .octane-handheld-sheet__body {
+    flex-direction: row;
+    gap: var(--hh-space-2);
+    padding: 0;
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__pane {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__list {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    min-height: 0;
+    padding: 0 var(--hh-space-2) var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---------------------------------------------------------------- rooms column (on its side) */
+
+:root[data-handheld] .octane-handheld-chat-history__rooms {
+    display: flex;
+    flex: 0 0 188px;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-1);
+    min-height: 0;
+    padding: var(--hh-space-2) 0 var(--hh-space-2) var(--hh-space-2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__room {
+    display: grid;
+    flex: none;
+    grid-template-columns: 20px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--hh-space-2);
+    box-sizing: border-box;
+    align-items: center;
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__room .octane-icon {
+    grid-row: 1 / 3;
+    justify-self: center;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__room:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-chat-history__room[aria-current] {
+    border-color: var(--hh-air-blue-light);
+    background: var(--hh-air-track-light);
+    box-shadow: inset 4px 0 0 var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-chat-history__room-name {
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__room-meta {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+/* ---------------------------------------------------------------- a room visit */
+
+/* Lines far off screen are not laid out until they come near (a full history is a thousand bubbles). */
+:root[data-handheld] .octane-handheld-chat-history__line,
+:root[data-handheld] .octane-handheld-chat-history__event {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 40px;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__section-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 36px;
+    margin: 0 calc(-1 * var(--hh-space-2)) var(--hh-space-1);
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border-bottom: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-chat-history__section-name {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__section-head[data-earlier] .octane-handheld-chat-history__section-name {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-chat-history__section-time {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+/* ---------------------------------------------------------------- a line */
+
+/* Time | the room's bubble | ignore. A line of the same minute as the one above leaves its time out. */
+:root[data-handheld] .octane-handheld-chat-history__line,
+:root[data-handheld] .octane-handheld-chat-history__event {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    column-gap: var(--hh-space-1);
+    align-items: center;
+    min-height: 36px;
+    padding: 2px 0;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__time {
+    align-self: start;
+    padding-top: 7px;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    font-style: italic;
+    line-height: 15px;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__bubble {
+    min-width: 0;
+    padding-top: 4px;
+}
+
+/* The bubble is the room's (ChatWidgetMessageView): as wide as the line allows, not the desktop's 335 px. */
+:root[data-handheld] .octane-handheld-chat-history__bubble .octane-chat-history-bubble,
+:root[data-handheld] .octane-handheld-chat-history__bubble .chat-bubble {
+    max-width: 100%;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__bubble .octane-chat-history-bubble {
+    width: auto;
+    max-width: 100%;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__bubble .chat-bubble {
+    display: inline-block;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__ignore {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    color: var(--hh-air-text-muted);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-chat-history__ignore svg {
+    width: 15px;
+    height: 15px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__ignore:active {
+    background: var(--hh-air-box);
+    color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-chat-history__ignore:focus-visible {
+    outline: var(--hh-focus-on-paper);
+}
+
+/* Something that happened in the room (a sound played): a soft chip, not a bubble. */
+:root[data-handheld] .octane-handheld-chat-history__event-text {
+    display: inline-flex;
+    justify-self: start;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    max-width: 100%;
+    min-height: 28px;
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__event-text .octane-icon {
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- empty, newest */
+
+:root[data-handheld] .octane-handheld-chat-history__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-height: 100%;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__latest {
+    position: absolute;
+    right: var(--hh-space-3);
+    bottom: var(--hh-space-3);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue-header);
+    box-shadow: var(--hh-shadow-float), var(--hh-edge);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__latest svg {
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-chat-history__latest:active {
+    background: var(--hh-air-blue-deep);
+}

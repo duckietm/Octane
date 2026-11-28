@@ -4,6 +4,8 @@ import { CopyToClipboard, GetConfigurationValue, LocalizeText } from '../../../a
 import { Button, LayoutRoomThumbnailView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useNavigatorData } from '../../../hooks';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomLinkView } from './HandheldRoomLinkView';
 
 export class NavigatorRoomLinkViewProps {
     onCloseClick: () => void;
@@ -13,6 +15,7 @@ export const NavigatorRoomLinkView: FC<NavigatorRoomLinkViewProps> = (props) => 
     const { onCloseClick = null } = props;
     const { navigatorData } = useNavigatorData();
     const [copied, setCopied] = useState(false);
+    const isHandheld = useIsHandheld();
 
     const roomLink = useMemo(() => {
         if (!navigatorData.enteredGuestRoom) return '';
@@ -24,6 +27,20 @@ export const NavigatorRoomLinkView: FC<NavigatorRoomLinkViewProps> = (props) => 
     }, [navigatorData.enteredGuestRoom]);
 
     if (!navigatorData.enteredGuestRoom) return null;
+
+    const copy = () => void CopyToClipboard(roomLink).then(setCopied);
+
+    if (isHandheld)
+        return (
+            <HandheldRoomLinkView
+                copied={copied}
+                customUrl={navigatorData.enteredGuestRoom.officialRoomPicRef}
+                roomId={navigatorData.enteredGuestRoom.roomId}
+                roomLink={roomLink}
+                onClose={onCloseClick}
+                onCopy={copy}
+            />
+        );
 
     return (
         <NativeTextTree>
@@ -52,7 +69,7 @@ export const NavigatorRoomLinkView: FC<NavigatorRoomLinkViewProps> = (props) => 
                                     variant="secondary"
                                     title={LocalizeText('generic.copy')}
                                     aria-label={LocalizeText('generic.copy')}
-                                    onClick={() => void CopyToClipboard(roomLink).then(setCopied)}
+                                    onClick={copy}
                                 >
                                     {copied ? <FaCheck className="fa-icon" /> : <FaCopy className="fa-icon" />}
                                 </Button>

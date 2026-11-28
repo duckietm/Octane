@@ -6,6 +6,8 @@ import { useMessageEvent, useNavigatorData, useUserDataSnapshot, useUserPermissi
 import { OctaneButton } from '../../../layout';
 import { Select } from '../../../common/Select';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldEnforceCategoryView } from './HandheldEnforceCategoryView';
 
 /** Selection types of RoomCategorySelectionEnforcement: after creating a room, after saving its settings. */
 const SELECTION_ROOM_CREATED = 1;
@@ -30,6 +32,7 @@ export const NavigatorEnforceCategoryView: FC<{}> = () => {
     const { securityLevel } = useUserDataSnapshot();
     const permissions = useUserPermissions();
     // acc_navigator_staff; a server that sends no keys keeps Flash's staff level (4).
+    const isHandheld = useIsHandheld();
     const isNavigatorStaff = permissions.size ? permissions.get('acc_navigator_staff') === 1 : securityLevel >= 4;
 
     const selectableCategories = useMemo(
@@ -58,6 +61,21 @@ export const NavigatorEnforceCategoryView: FC<{}> = () => {
         SendMessageComposer(new UpdateRoomCategoryAndTradeSettingsComposer(roomId, categoryId, tradeMode));
         setRoomId(0);
     };
+
+    if (isHandheld) {
+        return (
+            <HandheldEnforceCategoryView
+                categories={selectableCategories}
+                categoryId={categoryId}
+                tradeMode={tradeMode}
+                tradeOptions={TRADE_OPTIONS}
+                onCategory={setCategoryId}
+                onClose={() => setRoomId(0)}
+                onSave={save}
+                onTradeMode={setTradeMode}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

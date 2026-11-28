@@ -173,6 +173,11 @@ import './css/handheld/HandheldBuildHeight.css';
 import './css/handheld/HandheldHousekeeping.css';
 import './css/handheld/HandheldModTools.css';
 import './css/handheld/HandheldFortuneWheel.css';
+import './css/handheld/HandheldChatHistory.css';
+import './css/handheld/HandheldRoomSettings.css';
+import './css/handheld/HandheldInventoryDialogs.css';
+import './css/handheld/HandheldShopDialogs.css';
+import './css/handheld/HandheldRoomExtras.css';
 import './css/common/ClassicScrollbar.css';
 
 document.documentElement.classList.add('has-classic-scrollbar');

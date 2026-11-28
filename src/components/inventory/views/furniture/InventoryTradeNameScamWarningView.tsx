@@ -4,7 +4,9 @@ import { findLookalikeNames, GetUserProfile, localizeWithFallback, MessengerFrie
 import { LayoutAvatarImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFriendsState, useInventoryTrade, useRoomUserListSnapshot } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { OctaneButton } from '../../../../layout';
+import { HandheldInventoryTradeNameScamWarningView } from './HandheldInventoryTradeNameScamWarningView';
 
 /** Seconds the warning stays up before it can be closed (official TradingNameScamWarningView). */
 const CLOSE_LOCK_SECONDS = 6;
@@ -44,6 +46,7 @@ export const InventoryTradeNameScamWarningView: FC<{}> = () => {
     const { isTrading = false, otherUser = null } = useInventoryTrade();
     const { friends = [] } = useFriendsState();
     const roomUsers = useRoomUserListSnapshot();
+    const isHandheld = useIsHandheld();
     const otherUserId = isTrading ? (otherUser?.userId ?? 0) : 0;
 
     const [checkedUserId, setCheckedUserId] = useState(0);
@@ -70,6 +73,21 @@ export const InventoryTradeNameScamWarningView: FC<{}> = () => {
     const close = () => {
         if (lockSeconds <= 0) setWarning(null);
     };
+
+    // A phone gets a centred card with the same check, lock and profile link.
+    if (isHandheld)
+        return (
+            <HandheldInventoryTradeNameScamWarningView
+                figure={warning.figure}
+                lockSeconds={lockSeconds}
+                lockTotal={CLOSE_LOCK_SECONDS}
+                similarInFriends={warning.similarInFriends}
+                similarInRoom={warning.similarInRoom}
+                userName={warning.userName}
+                onClose={close}
+                onOpenProfile={() => GetUserProfile(warning.userId)}
+            />
+        );
 
     return (
         <NativeTextTree>

@@ -25,6 +25,8 @@ import {
     useRaidProtectionController,
     useRaidProtectionStore
 } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRaidProtectionView } from './HandheldRaidProtectionView';
 
 const text = (key: string, fallback: string) => localizeWithFallback(`raid.protection.settings.${ key }`, fallback);
 
@@ -53,6 +55,7 @@ export const NavigatorRaidProtectionView: FC<{}> = () =>
     const [ form, setForm ] = useState<IRaidProtectionEditable | null>(null);
     const [ confirming, setConfirming ] = useState(false);
     const confirmTokenRef = useRef(0);
+    const isHandheld = useIsHandheld();
 
     const onSaveResult = useCallback((resultCode: number) =>
     {
@@ -152,6 +155,33 @@ export const NavigatorRaidProtectionView: FC<{}> = () =>
         ? localizeWithFallback('raid.protection.settings.status.inactive.last', 'There is no raid going on. Last raid: %timestamp%', [ 'timestamp' ], [ new Date(settings.lastRaidAtEpochSeconds * 1000).toLocaleString() ])
         : text('status.inactive', 'There is no raid going on');
 
+    const actionOptions = [
+        { value: 0, label: text('action.kick', 'Kick the player out of the room') },
+        { value: 1, label: text('action.temporary_ban', 'Temporary ban') }
+    ];
+
+    if(isHandheld)
+    {
+        return (
+            <HandheldRaidProtectionView
+                actionOptions={ actionOptions }
+                banDisabled={ banDisabled }
+                banOptions={ durationOptions(RAID_PROTECTION_BAN_DURATIONS) }
+                busy={ busy }
+                form={ form }
+                guardDisabled={ guardDisabled }
+                guardOptions={ durationOptions(RAID_PROTECTION_GUARD_DURATIONS) }
+                inactiveText={ inactiveText }
+                incidentActive={ settings.incidentActive }
+                protectionDisabled={ protectionDisabled }
+                sensitivityOptions={ sensitivityOptions() }
+                text={ text }
+                onClose={ close }
+                onSave={ save }
+                onUpdate={ update } />
+        );
+    }
+
     return (
         <NativeTextTree>
             <OctaneCardView className="octane-raid-protection" frameStyle={ 3 } isResizable={ false } theme="primary-slim" uniqueKey="raid-protection-settings">
@@ -176,10 +206,7 @@ export const NavigatorRaidProtectionView: FC<{}> = () =>
                                 <UbuntuDropmenuView
                                     disabled={ protectionDisabled }
                                     label={ text('action.label', 'When a raid is detected') }
-                                    options={ [
-                                        { value: 0, label: text('action.kick', 'Kick the player out of the room') },
-                                        { value: 1, label: text('action.temporary_ban', 'Temporary ban') }
-                                    ] }
+                                    options={ actionOptions }
                                     value={ form.actionType }
                                     onSelect={ value => update({ actionType: Number(value) }) } />
                             </div>

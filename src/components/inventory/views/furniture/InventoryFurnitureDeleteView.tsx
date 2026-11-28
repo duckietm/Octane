@@ -6,7 +6,9 @@ import { LayoutFurniImageView, OctaneCardHeaderView, OctaneCardView } from '../.
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { DeleteItemConfirmEvent } from '../../../../events';
 import { useNotification, useUiEvent } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { OctaneButton, OctaneInput } from '../../../../layout';
+import { HandheldInventoryFurnitureDeleteView } from './HandheldInventoryFurnitureDeleteView';
 
 export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
     const [item, setItem] = useState<FurnitureItem>(null);
@@ -16,6 +18,7 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
     // A second click on Delete used to stack a second confirm, and confirming both deleted the amount twice.
     const confirmOpenRef = useRef(false);
     const { showConfirm = null } = useNotification();
+    const isHandheld = useIsHandheld();
 
     const releaseConfirm = () => {
         confirmOpenRef.current = false;
@@ -75,6 +78,24 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
     if (!item) return null;
 
     const furniTitle = LocalizeText(item.isWallItem ? 'wallItem.name.' + item.type : 'roomItem.name.' + item.type);
+
+    // A phone gets a centred card with the same amount rule, confirm and packet.
+    if (isHandheld)
+        return (
+            <HandheldInventoryFurnitureDeleteView
+                amount={amount}
+                confirming={confirming}
+                extraData={item.extra.toString()}
+                furniTitle={furniTitle}
+                isWallItem={item.isWallItem}
+                maxAmount={maxAmount}
+                productClassId={item.type}
+                title={localizeWithFallback('inventory.delete.confirm_delete.title', 'Delete furniture')}
+                onAmountChange={updateAmount}
+                onClose={onClose}
+                onDelete={deleteItem}
+            />
+        );
 
     return (
         <NativeTextTree>

@@ -12,6 +12,8 @@ import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useNotification } from '../../../hooks';
 import { useCursedDragonAdoption } from '../../../hooks/catalog/useCursedDragonAdoption';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldCursedDragonAdoptionView } from './HandheldCursedDragonAdoptionView';
 
 const POSTURE_TICK_MS = 1000;
 
@@ -28,6 +30,7 @@ export const CursedDragonAdoptionView: FC<{}> = () => {
     const { isVisible = false, claimState = CursedDragonClaimState.UNKNOWN, canClaim = false, close = null, makeClaim = null } = useCursedDragonAdoption();
     const { showConfirm = null } = useNotification();
     const [elapsed, setElapsed] = useState(0);
+    const isHandheld = useIsHandheld();
 
     // AIR CursedDragonPreviewView.update: the dragons breathe fire and eat on a 24 second loop while the window shows.
     useEffect(() => {
@@ -68,6 +71,37 @@ export const CursedDragonAdoptionView: FC<{}> = () => {
             localizeWithFallback('cursed_dragon_adoption.confirm.title', 'Adopt this dragon?')
         );
     };
+
+    if (isHandheld)
+        return (
+            <HandheldCursedDragonAdoptionView
+                adoptLabel={adoptLabel}
+                choices={CHOICES.map(({ choice, side, direction, fallbackTitle, fallbackName }) => ({
+                    side,
+                    name: localizeWithFallback(`cursed_dragon_adoption.${side}`, fallbackTitle),
+                    pet: (
+                        <LayoutPetImageView
+                            direction={direction}
+                            paletteId={choice}
+                            posture={cursedDragonPosture(choice, elapsed)}
+                            scale={2}
+                            typeId={petType}
+                        />
+                    ),
+                    onAdopt: () => confirmAdoption(choice, fallbackName)
+                }))}
+                disabled={buttonsDisabled}
+                eyebrow={localizeWithFallback('cursed_dragon_adoption.eyebrow', 'A CURSE FROM THE CAVES')}
+                hint={localizeWithFallback('cursed_dragon_adoption.choose', 'Choose the dragon you want to adopt')}
+                introBody={localizeWithFallback(
+                    'cursed_dragon_adoption.intro.body',
+                    'Deep in the cursed caves two dragon crates were found. Each holds a young dragon looking for an owner. You can adopt one of them, for free, but only one: choose carefully.'
+                )}
+                introTitle={localizeWithFallback('cursed_dragon_adoption.intro.title', 'Two dragons need a home')}
+                title={localizeWithFallback('cursed_dragon_adoption.title', 'Cursed Dragon Adoption')}
+                onClose={close}
+            />
+        );
 
     return (
         <NativeTextTree>

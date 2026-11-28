@@ -5,6 +5,8 @@ import { Column, Flex, Grid, Text } from '../../../../common';
 import { OctaneInput } from '../../../../layout';
 import { NavigatorRoomSettingsFieldErrorView } from './NavigatorRoomSettingsFieldErrorView';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomSettingsVipChatView } from './HandheldRoomSettingsTabs';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -22,12 +24,55 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
     const [idleAutokickTimeoutSeconds, setIdleAutokickTimeoutSeconds] = useState<string>('');
     const isHC = GetClubMemberLevel() > 0;
     const minimumAutokickTimeoutSeconds = Math.max(60, (Number(idleSleepTimeoutSeconds) || 30) + 30);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         setChatDistance(roomData.chatSettings.distance);
         setIdleSleepTimeoutSeconds(roomData.idleSleepTimeoutSeconds ? roomData.idleSleepTimeoutSeconds.toString() : '');
         setIdleAutokickTimeoutSeconds(roomData.idleAutokickTimeoutSeconds ? roomData.idleAutokickTimeoutSeconds.toString() : '');
     }, [roomData.chatSettings, roomData.idleSleepTimeoutSeconds, roomData.idleAutokickTimeoutSeconds]);
+
+    const commitChatDistance = () => handleChange('chat_distance', chatDistance);
+
+    const commitIdleSleep = (text: string) => {
+        const value = Math.max(30, Math.min(3600, Number(text) || 30));
+        const requiredAutokickTimeout = Math.max(60, value + 30);
+        setIdleSleepTimeoutSeconds(value.toString());
+
+        if (roomData.idleAutokickEnabled && (Number(idleAutokickTimeoutSeconds) || 0) < requiredAutokickTimeout) {
+            setIdleAutokickTimeoutSeconds(requiredAutokickTimeout.toString());
+            handleChange('idle_autokick_timeout_seconds', requiredAutokickTimeout);
+        }
+
+        handleChange('idle_sleep_timeout_seconds', value);
+    };
+
+    const commitIdleAutokick = (text: string) => {
+        const value = Math.max(minimumAutokickTimeoutSeconds, Math.min(36000, Number(text) || minimumAutokickTimeoutSeconds));
+        setIdleAutokickTimeoutSeconds(value.toString());
+        handleChange('idle_autokick_timeout_seconds', value);
+    };
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomSettingsVipChatView
+                chatDistance={chatDistance}
+                commitChatDistance={commitChatDistance}
+                commitIdleAutokick={commitIdleAutokick}
+                commitIdleSleep={commitIdleSleep}
+                errors={errors}
+                handleChange={handleChange}
+                idleAutokickTimeoutSeconds={idleAutokickTimeoutSeconds}
+                idleSleepTimeoutSeconds={idleSleepTimeoutSeconds}
+                isHC={isHC}
+                minimumAutokickTimeoutSeconds={minimumAutokickTimeoutSeconds}
+                roomData={roomData}
+                onChatDistance={setChatDistance}
+                onIdleAutokick={setIdleAutokickTimeoutSeconds}
+                onIdleSleep={setIdleSleepTimeoutSeconds}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -89,7 +134,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                                 min="0"
                                 type="number"
                                 value={chatDistance}
-                                onBlur={(event) => handleChange('chat_distance', chatDistance)}
+                                onBlur={commitChatDistance}
                                 onChange={(event) => setChatDistance(event.target.valueAsNumber)}
                             />
                         </NavigatorRoomSettingsSectionView>
@@ -150,18 +195,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                                     max="3600"
                                     type="number"
                                     value={idleSleepTimeoutSeconds}
-                                    onBlur={(event) => {
-                                        const value = Math.max(30, Math.min(3600, Number(event.currentTarget.value) || 30));
-                                        const requiredAutokickTimeout = Math.max(60, value + 30);
-                                        setIdleSleepTimeoutSeconds(value.toString());
-
-                                        if (roomData.idleAutokickEnabled && (Number(idleAutokickTimeoutSeconds) || 0) < requiredAutokickTimeout) {
-                                            setIdleAutokickTimeoutSeconds(requiredAutokickTimeout.toString());
-                                            handleChange('idle_autokick_timeout_seconds', requiredAutokickTimeout);
-                                        }
-
-                                        handleChange('idle_sleep_timeout_seconds', value);
-                                    }}
+                                    onBlur={(event) => commitIdleSleep(event.currentTarget.value)}
                                     onChange={(event) => setIdleSleepTimeoutSeconds(event.target.value)}
                                 />
                                 <Text small>{LocalizeText('navigator.roomsettings.timeout.seconds')}</Text>
@@ -180,14 +214,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                                     max="36000"
                                     type="number"
                                     value={idleAutokickTimeoutSeconds}
-                                    onBlur={(event) => {
-                                        const value = Math.max(
-                                            minimumAutokickTimeoutSeconds,
-                                            Math.min(36000, Number(event.currentTarget.value) || minimumAutokickTimeoutSeconds)
-                                        );
-                                        setIdleAutokickTimeoutSeconds(value.toString());
-                                        handleChange('idle_autokick_timeout_seconds', value);
-                                    }}
+                                    onBlur={(event) => commitIdleAutokick(event.currentTarget.value)}
                                     onChange={(event) => setIdleAutokickTimeoutSeconds(event.target.value)}
                                 />
                                 <Text small>{LocalizeText('navigator.roomsettings.timeout.seconds')}</Text>

@@ -14,6 +14,8 @@ import { BaseButton } from '../../../common/BaseButton';
 import { ListSelect } from '../../../common/ListSelect';
 import { ToggleButton } from '../../../common/ToggleButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomCreatorView } from './HandheldRoomCreatorView';
 
 const AIR_TRADE_KEYS = ['navigator.roomsettings.trade_not_allowed', 'navigator.roomsettings.trade_not_with_Controller', 'navigator.roomsettings.trade_allowed'];
 
@@ -74,6 +76,8 @@ export const NavigatorRoomCreatorView: FC = () => {
     // acc_navigator_staff; a server that sends no keys keeps Flash's staff level (4).
     const isNavigatorStaff = permissions.size ? permissions.get('acc_navigator_staff') === 1 : securityLevel >= 4;
     const beginCreate = useRoomCreatorStore((state) => state.beginCreate);
+    const isCreating = useRoomCreatorStore((state) => state.isCreating);
+    const isHandheld = useIsHandheld();
 
     const hcDisabled = GetConfigurationValue<boolean>('hc.disabled', false);
     const effectiveClubLevel = hcDisabled ? 2 : clubLevel;
@@ -157,6 +161,47 @@ export const NavigatorRoomCreatorView: FC = () => {
     };
 
     const showVipPromo = effectiveClubLevel < 2 && !hcDisabled;
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomCreatorView
+                categories={selectableCategories.map((category) => LocalizeText(category.name))}
+                categoryIndex={safeCategoryIndex}
+                clubLevel={effectiveClubLevel}
+                description={descriptionTouched ? description : ''}
+                descriptionMaxLength={128}
+                descriptionPlaceholder={descriptionPlaceholder}
+                isCreating={isCreating}
+                modelImage={getRoomModelImage}
+                models={visibleModels}
+                name={nameTouched ? name : ''}
+                nameError={nameError}
+                nameMaxLength={25}
+                namePlaceholder={namePlaceholder}
+                selectedModelName={selectedModelName}
+                showVipPromo={showVipPromo}
+                tradeIndex={tradeIndex}
+                trades={AIR_TRADE_KEYS.map((key) => LocalizeText(key))}
+                visitors={visitorOptions}
+                visitorsIndex={safeVisitorsIndex}
+                onCategory={setCategoryIndex}
+                onClose={closeCreator}
+                onCreate={createRoom}
+                onDescription={setDescription}
+                onDescriptionFocus={() => setDescriptionTouched(true)}
+                onName={setName}
+                onNameFocus={() => {
+                    if (nameTouched) return;
+                    setNameTouched(true);
+                    setNameError(null);
+                }}
+                onSelectModel={selectModel}
+                onTrade={setTradeIndex}
+                onVipPromo={() => CreateLinkEvent('habboUI/open/hccenter')}
+                onVisitors={setVisitorsIndex}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

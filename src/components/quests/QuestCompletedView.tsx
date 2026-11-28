@@ -1,11 +1,13 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { getActivityPointName, getCampaignImageUrl, getCampaignName, getQuestCompletedText, isQuestRewardVisible, localizeWithFallback } from '../../api';
+import { getActivityPointIconType, getActivityPointName, getCampaignImageUrl, getCampaignName, getQuestCompletedText, isQuestRewardVisible, localizeWithFallback } from '../../api';
 import { Button, DraggableWindowPosition } from '../../common';
 import { useQuests } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldQuestCompletedView } from './HandheldQuestCompletedView';
 
 /** The official dialog waits two seconds after the completion packet before it appears. */
 const SHOW_DELAY_MS = 2000;
@@ -17,6 +19,7 @@ const SHOW_DELAY_MS = 2000;
 export const QuestCompletedView: FC<{}> = () => {
     const { completion = null, requestNextQuest = null, clearCompletion = null } = useQuests();
     const [visibleFor, setVisibleFor] = useState<number>(0);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         if (!completion || !completion.showDialog) {
@@ -55,15 +58,51 @@ export const QuestCompletedView: FC<{}> = () => {
         close();
     };
 
+    const title = lastQuestInCampaign
+        ? localizeWithFallback('quests.completed.campaign.title', '%category% completed!', ['category'], [campaignName])
+        : localizeWithFallback('quests.completed.quest.title', '%category% quest completed', ['category'], [campaignName]);
+
+    if (isHandheld)
+        return (
+            <HandheldQuestCompletedView
+                campaignImageUrl={getCampaignImageUrl(quest.campaignCode)}
+                caption={
+                    lastQuestInCampaign
+                        ? localizeWithFallback('quests.completed.campaign.caption', 'Campaign completed!')
+                        : localizeWithFallback('quests.completed.quest.caption', 'Quest completed!')
+                }
+                catalogLabel={
+                    !lastQuestInCampaign && rewardVisible
+                        ? localizeWithFallback('quests.completed.cataloglink', 'Spend your %currencyname%', ['currencyname'], [currencyName])
+                        : null
+                }
+                lastQuestInCampaign={lastQuestInCampaign}
+                reward={
+                    rewardVisible
+                        ? {
+                              text: localizeWithFallback(
+                                  'quests.completed.reward',
+                                  'You earned %amount% %currencyname%!',
+                                  ['amount', 'currencyname'],
+                                  [String(quest.rewardCurrencyAmount), currencyName]
+                              ),
+                              iconType: getActivityPointIconType(quest.activityPointType)
+                          }
+                        : null
+                }
+                text={getQuestCompletedText(quest)}
+                title={title}
+                onCatalog={onCatalog}
+                onMoreQuests={onMoreQuests}
+                onNextQuest={onNextQuest}
+            />
+        );
+
     return (
         <NativeTextTree>
             <OctaneCard className="octane-quest-completed" uniqueKey="quest-completed" windowPosition={DraggableWindowPosition.CENTER}>
                 <OctaneCard.Header
-                    headerText={
-                        lastQuestInCampaign
-                            ? localizeWithFallback('quests.completed.campaign.title', '%category% completed!', ['category'], [campaignName])
-                            : localizeWithFallback('quests.completed.quest.title', '%category% quest completed', ['category'], [campaignName])
-                    }
+                    headerText={title}
                     onCloseClick={onNextQuest}
                 />
                 <OctaneCard.Content className="octane-quest-completed-content">

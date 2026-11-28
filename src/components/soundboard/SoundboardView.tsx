@@ -15,6 +15,8 @@ import { SoundboardPadView } from './SoundboardPadView';
 import { SoundboardShelfView } from './SoundboardShelfView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldSoundboardContentView, HandheldSoundboardView } from './HandheldSoundboardView';
 
 const PAGE_SIZE = 10;
 const PLAYING_MS = 1_500;
@@ -57,6 +59,7 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
     const [categoryId, setCategoryId] = useState('all');
     const [page, setPage] = useState(0);
     const searchRef = useRef<HTMLInputElement>(null);
+    const isHandheld = useIsHandheld();
     const filteredSounds = useMemo(
         () => filterSoundboardSounds(sounds, query, categoryId, recentSoundIds, favoriteIds),
         [sounds, query, categoryId, recentSoundIds, favoriteIds]
@@ -120,6 +123,40 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
         setPage(0);
     };
 
+    const shelfLabel = favoriteIds.length ? `★ ${LocalizeText('soundboard.category.favorites')}` : LocalizeText('soundboard.category.recent');
+
+    // Phone: every sound of the choice in one scrolling grid of tiles (no pages, no hotkeys).
+    if (isHandheld) {
+        const chips = [
+            ...(favoriteIds.length ? [{ id: 'favorites', label: `★ ${LocalizeText('soundboard.category.favorites')}` }] : []),
+            { id: 'all', label: LocalizeText('soundboard.category.all') },
+            ...(recentSoundIds.length ? [{ id: 'recent', label: LocalizeText('soundboard.category.recent') }] : []),
+            ...categories.map((category) => ({ id: category.id, label: category.label }))
+        ];
+
+        return (
+            <HandheldSoundboardContentView
+                categoryId={categoryId}
+                chips={chips}
+                cooldownPercent={cooldownPercent}
+                favoriteIds={favoriteSet}
+                isCoolingDown={isCoolingDown}
+                playingSoundId={playingSoundId}
+                query={query}
+                rightsOnly={rightsOnly}
+                shelfLabel={shelfLabel}
+                shelfSounds={shelfSounds}
+                silencedCount={silencedCount}
+                sounds={filteredSounds}
+                onCategory={selectCategory}
+                onPlay={onPlay}
+                onQuery={setQuery}
+                onRestoreSilenced={onRestoreSilenced}
+                onToggleFavorite={onToggleFavorite}
+            />
+        );
+    }
+
     const categoryClassName = (value: string) => `shrink-0 cursor-pointer rounded-full border px-2.5 py-1 text-[11px] font-bold transition-colors ${
         categoryId === value
             ? 'border-[#286889] bg-[#3d8fba] text-white'
@@ -142,7 +179,7 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
 
                 {!query.trim() && !!shelfSounds.length && (
                     <SoundboardShelfView
-                        label={favoriteIds.length ? `★ ${LocalizeText('soundboard.category.favorites')}` : LocalizeText('soundboard.category.recent')}
+                        label={shelfLabel}
                         sounds={shelfSounds}
                         disabled={isCoolingDown}
                         playingSoundId={playingSoundId}
@@ -253,6 +290,7 @@ export const SoundboardView: FC<{}> = () => {
     const lastPlayed = useSoundboardFeedStore((state) => state.lastPlayed);
     const [playingSoundId, setPlayingSoundId] = useState<number | null>(null);
     const wasVisibleRef = useRef(false);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -301,27 +339,31 @@ export const SoundboardView: FC<{}> = () => {
 
     if (!isVisible || !enabled) return null;
 
+    const content = (
+        <SoundboardContentView
+            sounds={sounds}
+            categories={categories}
+            recentSoundIds={recentSoundIds}
+            favoriteIds={favoriteIds}
+            isCoolingDown={isCoolingDown}
+            cooldownRemainingSeconds={cooldownRemainingSeconds}
+            cooldownTotalSeconds={cooldownTotalSeconds}
+            playingSoundId={playingSoundId}
+            silencedCount={silencedUserIds.length}
+            rightsOnly={roomMode === 2}
+            onPlay={play}
+            onToggleFavorite={(sound) => toggleFavorite(sound.id)}
+            onRestoreSilenced={restoreSilencedUsers}
+        />
+    );
+
+    if (isHandheld) return <HandheldSoundboardView onClose={() => setIsVisible(false)}>{content}</HandheldSoundboardView>;
+
     return (
         <NativeTextTree>
             <OctaneCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
                 <OctaneCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
-                <OctaneCard.Content>
-                    <SoundboardContentView
-                        sounds={sounds}
-                        categories={categories}
-                        recentSoundIds={recentSoundIds}
-                        favoriteIds={favoriteIds}
-                        isCoolingDown={isCoolingDown}
-                        cooldownRemainingSeconds={cooldownRemainingSeconds}
-                        cooldownTotalSeconds={cooldownTotalSeconds}
-                        playingSoundId={playingSoundId}
-                        silencedCount={silencedUserIds.length}
-                        rightsOnly={roomMode === 2}
-                        onPlay={play}
-                        onToggleFavorite={(sound) => toggleFavorite(sound.id)}
-                        onRestoreSilenced={restoreSilencedUsers}
-                    />
-                </OctaneCard.Content>
+                <OctaneCard.Content>{content}</OctaneCard.Content>
             </OctaneCard>
         </NativeTextTree>
     );

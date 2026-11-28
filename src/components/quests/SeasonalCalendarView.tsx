@@ -40,6 +40,8 @@ import { Button, DraggableWindowPosition, LayoutCurrencyIcon, LayoutFurniImageVi
 import { BaseButton } from '../../common/BaseButton';
 import { getSeasonalCalendarSettings, getSeasonalQuestRoomIds, usePurse, useQuests, useRoom, useSeasonalCalendar } from '../../hooks';
 import { OctaneCard } from '../../layout';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldSeasonalCalendarView } from './HandheldSeasonalCalendarView';
 import { QuestEntryView } from './QuestEntryView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
@@ -52,6 +54,10 @@ const localizeKeyOr = (key: string, fallback: string): string => {
 
     return value && value !== key ? value : fallback;
 };
+
+/** The name of a day: its campaign's name, or the day's own text, or its number. */
+const seasonalDayLabel = (day: SeasonalCalendarDay<QuestMessageData>, prefix: string): string =>
+    day.quest ? localizeKeyOr(`quests.${day.quest.campaignCode}.name`, String(day.day)) : localizeKeyOr(`quests.${prefix}_${day.day}.name`, String(day.day));
 
 const SeasonalArrow: FC<{ direction: 'back' | 'next'; active: boolean; onStep: () => void }> = ({ direction, active, onStep }) => {
     const [hover, setHover] = useState(false);
@@ -122,9 +128,7 @@ const SeasonalDayView: FC<{
     const baseColor = SEASONAL_INDICATOR_COLORS[day.state];
     const color = hover ? adjustSeasonalBrightness(baseColor, SEASONAL_HOVER_BRIGHTEN) : baseColor;
     const clickable = day.state === SEASONAL_DAY_ACTIVE && !!day.quest;
-    const label = day.quest
-        ? localizeKeyOr(`quests.${day.quest.campaignCode}.name`, String(day.day))
-        : localizeKeyOr(`quests.${prefix}_${day.day}.name`, String(day.day));
+    const label = seasonalDayLabel(day, prefix);
     const style = {
         left: `${SEASONAL_ENTITIES_LEFT_MARGIN + (day.day - 1) * SEASONAL_ENTITY_SPACING}px`,
         '--seasonal-indicator': toCssColor(color),
@@ -166,7 +170,7 @@ const SeasonalDayView: FC<{
 };
 
 /** CatalogPromo: the offer of the day, its furni, and the balance of the calendar currency. */
-const SeasonalCatalogPromoView: FC<{ currency: number }> = ({ currency }) => {
+const SeasonalCatalogPromoView: FC<{ currency: number; handheld?: boolean }> = ({ currency, handheld = false }) => {
     const { dailyOffer = null } = useSeasonalCalendar();
     const { getCurrencyAmount = null } = usePurse();
     const offer = dailyOffer?.offer ?? null;
@@ -188,11 +192,35 @@ const SeasonalCatalogPromoView: FC<{ currency: number }> = ({ currency }) => {
         return furniData?.name ?? '';
     }, [offer, product, productType]);
 
+    const showFurni = !!product && (productType === 's' || productType === 'i');
+    const openShop = () => offer && CreateLinkEvent(`catalog/open/offerId/${offer.offerId}`);
+
+    // Phone: the same offer as a card of the sheet (HandheldRoomExtras.css).
+    if (handheld)
+        return (
+            <section className="octane-handheld-rx__card octane-handheld-rx-seasonal__promo">
+                <span className="octane-handheld-rx-seasonal__promo-preview">
+                    {showFurni && <LayoutFurniImageView productType={product.productType} productClassId={product.furniClassId} extraData={product.extraParam} direction={2} />}
+                </span>
+                <span className="octane-handheld-rx-seasonal__promo-info">
+                    <span className="octane-handheld-rx__card-title">{localizeWithFallback('quests.seasonalcalendar.promo.header', 'Offer of the day')}</span>
+                    {!!productName && <span className="octane-handheld-rx-seasonal__promo-name">{productName}</span>}
+                    <span className="octane-handheld-rx-seasonal__promo-balance">
+                        <span>{localizeWithFallback('quests.seasonalcalendar.promo.balance', 'You have: %amount%', ['amount'], [String(balance)])}</span>
+                        <LayoutCurrencyIcon type={currency} />
+                    </span>
+                </span>
+                <BaseButton className="octane-handheld-rx__button is-primary" disabled={!offer} onClick={openShop}>
+                    {localizeWithFallback('quests.seasonalcalendar.promo.buy', 'To the Shop')}
+                </BaseButton>
+            </section>
+        );
+
     return (
         <NativeTextTree>
             <div className="octane-seasonal-promo">
                 <div className="octane-seasonal-promo-preview">
-                    {product && (productType === 's' || productType === 'i') && (
+                    {showFurni && (
                         <LayoutFurniImageView productType={product.productType} productClassId={product.furniClassId} extraData={product.extraParam} direction={2} />
                     )}
                 </div>
@@ -207,7 +235,7 @@ const SeasonalCatalogPromoView: FC<{ currency: number }> = ({ currency }) => {
                         className="octane-seasonal-promo-buy"
                         variant="success"
                         disabled={!offer}
-                        onClick={() => offer && CreateLinkEvent(`catalog/open/offerId/${offer.offerId}`)}
+                        onClick={openShop}
                     >
                         {localizeWithFallback('quests.seasonalcalendar.promo.buy', 'To the Shop')}
                     </Button>
@@ -218,11 +246,39 @@ const SeasonalCatalogPromoView: FC<{ currency: number }> = ({ currency }) => {
 };
 
 /** RareTeaser: three rares that unlock on configured days, from the calendar gallery. */
-const SeasonalRareTeaserView: FC<{ highestDay: number; imageHost: string }> = ({ highestDay, imageHost }) => {
+const SeasonalRareTeaserView: FC<{ highestDay: number; imageHost: string; handheld?: boolean }> = ({ highestDay, imageHost, handheld = false }) => {
     const days = parseSeasonalIntList(LocalizeText('quests.seasonalcalendar.rareteaser.days'));
     const images = parseSeasonalStringList(LocalizeText('quests.seasonalcalendar.rareteaser.images'));
     const pages = parseSeasonalStringList(LocalizeText('quests.seasonalcalendar.rareteaser.pages'));
     const { locked, daysUntilNext } = getRareTeaserState(days.slice(0, 3), highestDay);
+    const lockedLabel = localizeWithFallback('octane.handheld.room_extras.seasonal.locked', 'Locked');
+
+    // Phone: the same three rares as 56 px tiles on a card of the sheet (HandheldRoomExtras.css).
+    if (handheld)
+        return (
+            <section className="octane-handheld-rx__card octane-handheld-rx-seasonal__teaser">
+                <span className="octane-handheld-rx__card-title">{localizeWithFallback('quests.seasonalcalendar.rareteaser.header', 'Unlocked items')}</span>
+                <div className="octane-handheld-rx-seasonal__rares">
+                    {locked.map((isLocked, index) => (
+                        <BaseButton
+                            key={index}
+                            aria-label={isLocked ? lockedLabel : (pages[index] ?? '')}
+                            className="octane-handheld-rx-seasonal__rare"
+                            data-locked={isLocked || undefined}
+                            disabled={isLocked || !pages[index]}
+                            onClick={() => pages[index] && CreateLinkEvent(`catalog/open/${pages[index]}`)}
+                        >
+                            {isLocked ? <span className="octane-handheld-rx-seasonal__lock" /> : images[index] && <img src={`${imageHost}${images[index]}.png`} alt="" draggable={false} />}
+                        </BaseButton>
+                    ))}
+                </div>
+                {daysUntilNext !== -1 && (
+                    <span className="octane-handheld-rx__hint">
+                        {localizeWithFallback('quests.seasonalcalendar.rareteaser.info', '%days% days until the next unlock.', ['days'], [String(daysUntilNext)])}
+                    </span>
+                )}
+            </section>
+        );
 
     return (
         <NativeTextTree>
@@ -264,6 +320,7 @@ export const SeasonalCalendarView: FC<{}> = () => {
     const [offset, setOffset] = useState(-1);
     const [detailsQuest, setDetailsQuest] = useState<QuestMessageData>(null);
     const previousRoomRef = useRef(roomSession);
+    const isHandheld = useIsHandheld();
     const { currency, maximumEntities } = getSeasonalCalendarSettings();
     const imageHost = getSeasonalImageHost(GetConfigurationValue<string>('image.library.url', ''), prefix);
 
@@ -302,13 +359,58 @@ export const SeasonalCalendarView: FC<{}> = () => {
     if (!enabled) return null;
 
     const hasRoomLink = getSeasonalQuestRoomIds(prefix).length > 0;
+    const title = localizeWithFallback(`quests.${prefix}.title`, localizeWithFallback('quests.list.caption', 'Quests'));
+    const details = detailsQuest && (
+        <>
+            <QuestEntryView
+                quest={detailsQuest}
+                showHint
+                onAccept={(quest) => {
+                    // QuestDetails opened from the calendar: accept, close the calendar, go to a quest room.
+                    acceptQuest && acceptQuest(quest.id);
+                    setDetailsQuest(null);
+                    close && close();
+                    if (hasRoomLink && goToQuestRoom) goToQuestRoom();
+                }}
+                onReject={(quest) => {
+                    rejectQuest && rejectQuest(quest.id);
+                    setDetailsQuest(null);
+                }}
+            />
+            {hasRoomLink && detailsQuest.waitPeriodSeconds < 1 && (
+                <BaseButton className="octane-quest-link" onClick={() => goToQuestRoom && goToQuestRoom()}>
+                    {localizeWithFallback('quests.gotocampaignroom', 'Go to the campaign room')}
+                </BaseButton>
+            )}
+        </>
+    );
+
+    // Phone: one sheet with the days as tiles; the quest of a day opens inside it (HandheldSeasonalCalendarView).
+    if (isHandheld)
+        return isVisible ? (
+            <HandheldSeasonalCalendarView
+                days={days}
+                details={details}
+                detailsQuest={detailsQuest}
+                flashingDay={flashingDay}
+                highestDay={highestDay}
+                imageHost={imageHost}
+                labelOf={(day) => seasonalDayLabel(day, prefix)}
+                promo={<SeasonalCatalogPromoView handheld currency={currency} />}
+                teaser={<SeasonalRareTeaserView handheld highestDay={highestDay} imageHost={imageHost} />}
+                title={title}
+                onClose={() => close && close()}
+                onCloseDetails={() => setDetailsQuest(null)}
+                onOpenDay={setDetailsQuest}
+            />
+        ) : null;
 
     return (
         <NativeTextTree>
             <>
                 {isVisible && (
                     <OctaneCard className="octane-seasonal-calendar" uniqueKey="seasonal-calendar" windowPosition={DraggableWindowPosition.CENTER}>
-                        <OctaneCard.Header headerText={localizeWithFallback(`quests.${prefix}.title`, localizeWithFallback('quests.list.caption', 'Quests'))} onCloseClick={() => close && close()} />
+                        <OctaneCard.Header headerText={title} onCloseClick={() => close && close()} />
                         <OctaneCard.Content className="octane-seasonal-calendar-content">
                             <div className="octane-seasonal-strip-window">
                                 <div className="octane-seasonal-strip" style={{ transform: `translateX(-${currentOffset * SEASONAL_ENTITY_SPACING}px)` }}>
@@ -344,28 +446,7 @@ export const SeasonalCalendarView: FC<{}> = () => {
                 {detailsQuest && (
                     <OctaneCard className="octane-quest-details" uniqueKey="seasonal-quest-details" windowPosition={DraggableWindowPosition.CENTER}>
                         <OctaneCard.Header headerText={localizeWithFallback('quests.details.caption', 'Quest details')} onCloseClick={() => setDetailsQuest(null)} />
-                        <OctaneCard.Content className="octane-quest-details-content">
-                            <QuestEntryView
-                                quest={detailsQuest}
-                                showHint
-                                onAccept={(quest) => {
-                                    // QuestDetails opened from the calendar: accept, close the calendar, go to a quest room.
-                                    acceptQuest && acceptQuest(quest.id);
-                                    setDetailsQuest(null);
-                                    close && close();
-                                    if (hasRoomLink && goToQuestRoom) goToQuestRoom();
-                                }}
-                                onReject={(quest) => {
-                                    rejectQuest && rejectQuest(quest.id);
-                                    setDetailsQuest(null);
-                                }}
-                            />
-                            {hasRoomLink && detailsQuest.waitPeriodSeconds < 1 && (
-                                <BaseButton className="octane-quest-link" onClick={() => goToQuestRoom && goToQuestRoom()}>
-                                    {localizeWithFallback('quests.gotocampaignroom', 'Go to the campaign room')}
-                                </BaseButton>
-                            )}
-                        </OctaneCard.Content>
+                        <OctaneCard.Content className="octane-quest-details-content">{details}</OctaneCard.Content>
                     </OctaneCard>
                 )}
             </>

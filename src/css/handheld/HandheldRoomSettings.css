@@ -1,0 +1,1275 @@
+/*
+ * Phone room settings and the windows around them, in the Octane handheld look (HandheldTokens.css) inside the shared
+ * frame (HandheldSheetFrame): the settings sheet (tabs as pills, a strip with the room and where the last change stands,
+ * each tab a page of cards with 44 px rows and 16 px fields), the room info sheet, the room creator sheet, the word
+ * filter sheet and the category card. Upright everything reads top to bottom; on its side the pages use the width
+ * (two columns). Every selector is scoped to :root[data-handheld].
+ */
+
+/* ---------------------------------------------------------------- the sheet's body */
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-sheet__body {
+    gap: var(--hh-space-2);
+    padding-bottom: 0;
+}
+
+/* The strip under the tabs: the room's name, and whether the last change was taken. */
+:root[data-handheld] .octane-handheld-rs__status {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 32px;
+    padding: 0 var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rs__status-room {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rs__status-save {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    max-width: 60%;
+    padding: var(--hh-space-1) var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    transition: background-color var(--hh-fast) var(--hh-ease), color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__status-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-count-empty);
+}
+
+:root[data-handheld] .octane-handheld-rs__status[data-state='saving'] .octane-handheld-rs__status-dot {
+    background: var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-rs__status[data-state='saved'] .octane-handheld-rs__status-save {
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-green-deep);
+}
+
+:root[data-handheld] .octane-handheld-rs__status[data-state='saved'] .octane-handheld-rs__status-dot {
+    background: var(--hh-air-count-green);
+}
+
+:root[data-handheld] .octane-handheld-rs__status[data-state='error'] .octane-handheld-rs__status-save {
+    background: var(--hh-air-white);
+    color: var(--hh-air-red);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rs__status[data-state='error'] .octane-handheld-rs__status-dot {
+    background: var(--hh-air-red);
+}
+
+/* A page scrolls on its own; the tabs and the strip stay. */
+:root[data-handheld] .octane-handheld-rs__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: 0;
+    margin: 0 calc(var(--hh-space-3) * -1);
+    padding: var(--hh-space-1) var(--hh-space-3) var(--hh-space-4);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---------------------------------------------------------------- sections, cards and fields */
+
+:root[data-handheld] .octane-handheld-rs__section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__section-title {
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rs__section-hint,
+:root[data-handheld] .octane-handheld-rs__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rs__intro strong {
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-rs__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* Fields between check rows keep their room. */
+:root[data-handheld] .octane-handheld-rs__card:has(> .octane-handheld-rs__check) > .octane-handheld-rs__field {
+    padding: var(--hh-space-2) 0;
+}
+
+/* Rows of checks and choices sit flush, with lines between them. */
+:root[data-handheld] .octane-handheld-rs__card:has(> :is(.octane-handheld-rs__check, .octane-handheld-rs__radio)) {
+    gap: 0;
+    padding-top: var(--hh-space-1);
+    padding-bottom: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rs__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__label {
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rs__pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rs__pair.is-tight {
+    gap: var(--hh-space-2);
+}
+
+/* Two long drop-downs side by side do not fit a narrow phone upright: they stack there. */
+@media (max-width: 380px) {
+    :root[data-handheld='portrait'] .octane-handheld-rs__pair:not(.is-tight) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+:root[data-handheld] .octane-handheld-rs__stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__stack.is-sections {
+    gap: var(--hh-space-3);
+}
+
+/* Fields: 16 px so the phone does not zoom in, 44 px high. */
+:root[data-handheld] :is(.octane-handheld-rs, .octane-handheld-rs-modal) :is(.octane-handheld-rs__input, .octane-number-input.octane-handheld-rs__input) {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    transition: border-color var(--hh-fast) var(--hh-ease), background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-rs__input:focus {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-white);
+    outline: none;
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-rs__input::placeholder {
+    color: var(--hh-air-text-muted);
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-rs__input[aria-invalid='true'] {
+    border-color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-rs__input:disabled {
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-rs__input.is-area {
+    height: 96px;
+    padding: 10px var(--hh-space-3);
+    line-height: 21px;
+    resize: none;
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-handheld-rs__input.is-number {
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rs__counter {
+    align-self: flex-end;
+    margin-top: -2px;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 14px;
+}
+
+:root[data-handheld] :is(.octane-handheld-rs, .octane-handheld-rs-modal) .octane-select-trigger.octane-handheld-rs__select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background-color: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-field);
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] :is(.octane-handheld-rs, .octane-handheld-rs-modal) .octane-select-trigger.octane-handheld-rs__select[data-disabled] {
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-rs__error {
+    margin: 0;
+    color: var(--hh-air-red);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rs__card > .octane-handheld-rs__error {
+    padding: 0 0 var(--hh-space-2) 40px;
+}
+
+/* ---------------------------------------------------------------- check and choice rows */
+
+:root[data-handheld] :is(.octane-handheld-rs__check, .octane-handheld-rs__radio) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--hh-space-2);
+    min-height: var(--hh-touch);
+    border-bottom: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] :is(.octane-handheld-rs__check, .octane-handheld-rs__radio):last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__check[data-disabled='true'] .octane-handheld-rs__check-text {
+    color: var(--hh-air-text-muted);
+}
+
+/* The whole row is the box's label: a finger anywhere on it ticks the box. */
+:root[data-handheld] .octane-handheld-rs__check-label {
+    display: flex;
+    flex: 1 1 180px;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) 0;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rs__check-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Our own box: rounded, deep blue with a white tick when on. */
+:root[data-handheld] .octane-handheld-rs .octane-checkbox {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 24px;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    border: 2px solid var(--hh-air-border);
+    border-radius: 6px;
+    background: var(--hh-air-white);
+    transition: background-color var(--hh-fast) var(--hh-ease), border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-checkbox[data-checked] {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-checkbox[data-checked]::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 6px;
+    height: 11px;
+    border: solid var(--hh-on-dark);
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-radio {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 24px;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    border: 2px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-radio[data-checked] {
+    border-color: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-radio[data-checked]::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-rs .octane-checkbox:focus-visible,
+:root[data-handheld] .octane-handheld-rs .octane-radio:focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+/* The chosen door mode reads as chosen. */
+:root[data-handheld] .octane-handheld-rs__radio[data-checked='true'] .octane-handheld-rs__check-text {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* A number that belongs to a box (the idle times): beside it, a fixed width. */
+:root[data-handheld] .octane-handheld-rs__seconds {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 0 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-rs__seconds .octane-handheld-rs__input.is-number {
+    width: 88px;
+}
+
+/* The password under its choice: as wide as the card. */
+:root[data-handheld] .octane-handheld-rs__password {
+    display: flex;
+    flex: 1 1 100%;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: 0 0 var(--hh-space-3) 36px;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+:root[data-handheld] .octane-handheld-rs__button {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease), opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__button.is-primary {
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-rs__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-rs__button.is-secondary {
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-border);
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-rs__button.is-secondary:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rs__button.is-danger {
+    background: var(--hh-dismiss);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-rs__button:disabled {
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.45;
+}
+
+/* A full-width quiet button inside a card (clear all rights, the Builders Club page). */
+:root[data-handheld] .octane-handheld-rs__row-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--hh-touch);
+    margin-top: var(--hh-space-1);
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__row-button:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-rs__row-button.is-danger {
+    background: var(--hh-air-panel);
+    box-shadow: inset 0 0 0 1px var(--hh-air-red);
+    color: var(--hh-air-red);
+}
+
+/* Delete the room: red, apart from everything else, at the end of the basic tab. */
+:root[data-handheld] .octane-handheld-rs__delete {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    margin-top: var(--hh-space-2);
+    padding: 0 var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1.5px var(--hh-air-red), var(--hh-shadow-card);
+    color: var(--hh-air-red);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__delete:active {
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-rs__delete svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------------------------------------------------------------- people and words */
+
+:root[data-handheld] .octane-handheld-rs__section.is-list .octane-handheld-rs__card {
+    gap: 0;
+    padding: var(--hh-space-1) var(--hh-space-2) var(--hh-space-2);
+}
+
+:root[data-handheld] :is(.octane-handheld-rs__person, .octane-handheld-rs__word) {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 52px;
+    border-bottom: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] :is(.octane-handheld-rs__person, .octane-handheld-rs__word):last-of-type {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__person-profile {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    border-radius: var(--hh-radius-s);
+    background: transparent;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__person-profile:active {
+    background: var(--hh-air-track-light);
+}
+
+/* The first letter in a round blue well stands for the person. */
+:root[data-handheld] .octane-handheld-rs__person-mark {
+    display: flex;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-medium);
+    color: var(--hh-air-track-blue);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+}
+
+:root[data-handheld] :is(.octane-handheld-rs__person-name, .octane-handheld-rs__word-text) {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rs__word-text {
+    padding-left: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rs__person-action {
+    flex: none;
+    max-width: 50%;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+    box-shadow: inset 0 0 0 1px var(--hh-air-red);
+    color: var(--hh-air-red);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__person-action[data-tone='add'] {
+    background: var(--hh-air-track-light);
+    box-shadow: none;
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-rs__person-action:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-rs__empty {
+    margin: 0;
+    padding: var(--hh-space-3) var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- on its side: two columns */
+
+:root[data-handheld] .octane-handheld-rs__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+}
+
+/* The basic and access tabs lay their cards out in two columns on its side. */
+:root[data-handheld='landscape'] :is(.octane-handheld-rs__page[data-tab='1'], .octane-handheld-rs__page[data-tab='2']) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__page[data-tab='1'] > .octane-handheld-rs__section:first-child {
+    grid-row: span 3;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__page > .octane-handheld-rs__intro {
+    grid-column: 1 / -1;
+}
+
+/* ---------------------------------------------------------------- the question card */
+
+:root[data-handheld] .octane-handheld-rs__scrim,
+:root[data-handheld] .octane-handheld-rs-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    padding: max(var(--hh-space-4), var(--octane-safe-top, 0px)) var(--hh-space-4) max(var(--hh-space-4), var(--octane-safe-bottom, 0px));
+    background: var(--hh-air-outline);
+}
+
+/* The category card sits over every window. */
+:root[data-handheld] .octane-handheld-rs-modal {
+    z-index: 2000;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    box-sizing: border-box;
+    width: min(100%, 360px);
+    max-height: 100%;
+    padding: var(--hh-space-4);
+    overflow-y: auto;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-cream);
+    box-shadow: var(--hh-shadow-float);
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-title {
+    flex: 1 1 0;
+    margin: 0;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-text {
+    margin: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 19px;
+    white-space: pre-line;
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-actions {
+    display: flex;
+    gap: var(--hh-space-2);
+    margin-top: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-close {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-close::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-rs__dialog-close svg,
+:root[data-handheld] .octane-handheld-rs__chevron {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+:root[data-handheld] .octane-handheld-rs__chevron {
+    flex: none;
+    color: var(--hh-air-text-muted);
+}
+
+/* ---------------------------------------------------------------- room info */
+
+:root[data-handheld] .octane-handheld-rs__info-hero {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-picture {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(180deg, var(--hh-air-blue-light) 0%, var(--hh-air-blue) 100%);
+}
+
+/* The room's thumbnail at its own pixel size (110 x 110 drawn twice), centred on the blue. */
+:root[data-handheld] .octane-handheld-rs__info-thumbnail {
+    position: relative;
+    flex: none;
+    width: 110px;
+    height: 110px;
+    margin: var(--hh-space-3) 0;
+    zoom: 1.4;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-camera {
+    position: absolute;
+    right: var(--hh-space-2);
+    bottom: var(--hh-space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    box-shadow: var(--hh-edge);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-camera:active {
+    background: var(--hh-air-hud-solid);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-camera > .octane-icon {
+    zoom: 1.5;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-name {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+/* Home room: a round toggle with the house; filled in once this is the home room. */
+:root[data-handheld] .octane-handheld-rs__info-home {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-home > .octane-icon {
+    opacity: 0.45;
+    zoom: 1.5;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-home[data-pressed] {
+    background: var(--hh-air-track-tip);
+    box-shadow: inset 0 0 0 1.5px var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-home[data-pressed] > .octane-icon {
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-1) var(--hh-space-4);
+    margin: 0;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-facts > div {
+    display: flex;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-facts dt {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-facts dd {
+    margin: 0;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-description {
+    margin: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 19px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+/* Quick links as chips that wrap. */
+:root[data-handheld] .octane-handheld-rs__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rs__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__chip:active,
+:root[data-handheld] .octane-handheld-rs__chip[data-pressed] {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rs__chip img {
+    flex: none;
+    max-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-rs__info-group {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: 56px;
+    padding: var(--hh-space-1) var(--hh-space-3) var(--hh-space-1) var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-group:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-badge {
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-rs__info-group-name {
+    flex: 1 1 0;
+    min-width: 0;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+/* The owner's and staff tools: rows of one card. */
+:root[data-handheld] .octane-handheld-rs__tools {
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+:root[data-handheld] .octane-handheld-rs__tool {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 48px;
+    padding: 0 var(--hh-space-3) 0 var(--hh-space-4);
+    border: 0;
+    border-bottom: 1px solid var(--hh-air-box);
+    background: transparent;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-l);
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__tool:last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__tool:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rs__tool[data-action='open_room_settings'] {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rs__tool-label {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__report {
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--hh-air-red);
+    color: var(--hh-air-red);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__report:active {
+    background: var(--hh-air-white);
+}
+
+/* On its side: the room at the left, the links and tools at the right, each scrolling. */
+:root[data-handheld='landscape'] .octane-handheld-rs__info {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__info-picture {
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__info-thumbnail {
+    margin: var(--hh-space-2) 0;
+    zoom: 1;
+}
+
+/* ---------------------------------------------------------------- room creator */
+
+/* Upright one scroll with the bar stuck at the bottom; on its side fields | layouts, the bar under both. */
+:root[data-handheld] .octane-handheld-rs__creator {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0 calc(var(--hh-space-3) * -1);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld] .octane-handheld-rs__creator > .octane-handheld-rs__page {
+    flex: none;
+    margin: 0;
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-handheld-rs__creator > .octane-handheld-rs__creator-models {
+    padding-top: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__creator {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    overflow: hidden;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__creator > .octane-handheld-rs__page {
+    min-height: 0;
+    padding-top: var(--hh-space-1);
+    overflow-y: auto;
+}
+
+:root[data-handheld] .octane-handheld-rs__models {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rs__model {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    height: 112px;
+    padding: var(--hh-space-1) var(--hh-space-1) 6px;
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease), box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rs__model[data-pressed] {
+    background: var(--hh-air-track-light);
+    box-shadow: inset 0 0 0 2.5px var(--hh-air-blue-deep), var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rs__model[data-locked='true'] .octane-handheld-rs__model-picture {
+    opacity: 0.55;
+}
+
+:root[data-handheld] .octane-handheld-rs__model-picture {
+    flex: 1 1 0;
+    min-height: 0;
+    max-width: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rs__model-size {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rs__model[data-pressed] .octane-handheld-rs__model-size {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rs__model-club {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rs__promo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2) var(--hh-space-3);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-tip);
+}
+
+:root[data-handheld] .octane-handheld-rs__promo-text {
+    flex: 1 1 160px;
+    min-width: 0;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+/* The bar with the main action, over the page's end. */
+:root[data-handheld] .octane-handheld-rs__bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    margin-top: auto;
+    padding: var(--hh-space-2) var(--hh-space-3) max(var(--hh-space-2), var(--octane-safe-bottom, 0px));
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rs__bar > .octane-handheld-rs__button.is-primary {
+    flex-grow: 2;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs__bar {
+    grid-column: 1 / -1;
+}
+
+/* ---------------------------------------------------------------- word filter */
+
+:root[data-handheld] .octane-handheld-rs__add {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-rs__add > .octane-handheld-rs__button {
+    flex: 0 0 auto;
+}
+
+:root[data-handheld] .octane-handheld-rs__words {
+    gap: 0;
+    padding: var(--hh-space-1) var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rs.is-filter .octane-handheld-rs__page {
+    width: min(100%, 560px);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* ---------------------------------------------------------------- room link (from the room info and the room tools) */
+
+/* The desktop card stays a centred card; its link field and copy button get a finger's size. */
+:root[data-handheld] .octane-room-link .octane-navigator-air__link-field {
+    display: flex;
+    gap: var(--hh-space-2);
+    align-items: center;
+}
+
+:root[data-handheld] .octane-room-link .octane-navigator-air__link-field input {
+    box-sizing: border-box;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-s);
+    font-size: var(--hh-size-field);
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-room-link .octane-navigator-air__link-field button {
+    flex: 0 0 var(--hh-touch);
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+}

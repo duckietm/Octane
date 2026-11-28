@@ -19,6 +19,8 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NavigatorRoomSettingsFieldErrorView } from './NavigatorRoomSettingsFieldErrorView';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldRoomSettingsBasicView, RoomDeleteConfirm } from './HandheldRoomSettingsTabs';
 
 const ROOM_NAME_MIN_LENGTH = 3;
 const ROOM_NAME_MAX_LENGTH = 60;
@@ -42,6 +44,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     const { showConfirm = null } = useNotification();
     const { categories, navigatorData } = useNavigatorData();
     const { roomMode: soundboardRoomMode, setRoomMode: setSoundboardRoomMode } = useSoundboard();
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<YouTubeRoomSettingsEvent>(YouTubeRoomSettingsEvent, (event) => {
         setYoutubeEnabled(event.getParser().youtubeEnabled);
@@ -53,7 +56,8 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
         SendMessageComposer(new YouTubeRoomSettingsComposer(enabled));
     };
 
-    const deleteRoom = () => {
+    /** The delete question (text, title and what confirming does): the desktop asks it in a confirm window, the phone as a card. */
+    const getDeleteConfirm = (): RoomDeleteConfirm => {
         const enteredRoom = navigatorData?.enteredGuestRoom;
         const isGroupBase = !!enteredRoom && enteredRoom.roomId === roomData.roomId && enteredRoom.habboGroupId > 0;
         const confirmMessage = LocalizeText('navigator.roomsettings.deleteroom.confirm.message', ['room_name'], [roomData.roomName]);
@@ -71,20 +75,23 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
         // Deleting a group's room deletes the group with it.
         if (isGroupBase) warnings.push(localizeWithFallback('group.deletebase.body', 'This room is the home of a group: the group will be deleted too.'));
 
-        showConfirm(
-            [confirmMessage, ...warnings].join('\n\n'),
-            () => {
+        return {
+            title: LocalizeText('navigator.roomsettings.deleteroom.confirm.title'),
+            message: [confirmMessage, ...warnings].join('\n\n'),
+            onConfirm: () => {
                 SendMessageComposer(new RoomDeleteComposer(roomData.roomId));
 
                 if (onClose) onClose();
 
                 CreateLinkEvent('navigator/search/myworld_view');
-            },
-            null,
-            null,
-            null,
-            LocalizeText('navigator.roomsettings.deleteroom.confirm.title')
-        );
+            }
+        };
+    };
+
+    const deleteRoom = () => {
+        const confirm = getDeleteConfirm();
+
+        showConfirm(confirm.message, confirm.onConfirm, null, null, null, confirm.title);
     };
 
     const saveRoomName = (value = roomName) => {
@@ -116,6 +123,42 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
         setRoomTag1(roomData.tags.length > 0 && roomData.tags[0] ? roomData.tags[0] : '');
         setRoomTag2(roomData.tags.length > 0 && roomData.tags[1] ? roomData.tags[1] : '');
     }, [roomData]);
+
+    // As AIR: the visible categories that are not automatic, plus the room's own one.
+    const selectableCategories = (categories ?? []).filter((category) => (category.visible || category.id === roomData.categoryId) && !category.automatic);
+
+    if (isHandheld) {
+        return (
+            <HandheldRoomSettingsBasicView
+                categories={selectableCategories}
+                descriptionMaxLength={DESC_MAX_LENGTH}
+                errors={errors}
+                getDeleteConfirm={getDeleteConfirm}
+                handleChange={handleChange}
+                maxVisitors={GetMaxVisitorsList ?? []}
+                nameMaxLength={ROOM_NAME_MAX_LENGTH}
+                nameTooShort={roomName.length < ROOM_NAME_MIN_LENGTH}
+                roomData={roomData}
+                roomDescription={roomDescription}
+                roomName={roomName}
+                roomTag1={roomTag1}
+                roomTag2={roomTag2}
+                saveRoomDescription={saveRoomDescription}
+                saveRoomName={saveRoomName}
+                saveTags={saveTags}
+                setSoundboardMode={setSoundboardRoomMode}
+                soundboardMode={soundboardRoomMode}
+                tag1TooLong={roomTag1.length > TAGS_MAX_LENGTH}
+                tag2TooLong={roomTag2.length > TAGS_MAX_LENGTH}
+                toggleYouTube={toggleYouTube}
+                youtubeEnabled={youtubeEnabled}
+                onRoomDescription={setRoomDescription}
+                onRoomName={setRoomName}
+                onRoomTag1={setRoomTag1}
+                onRoomTag2={setRoomTag2}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

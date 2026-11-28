@@ -17,6 +17,8 @@ import { Checkbox } from '../../../common/Checkbox';
 import { InlineDialog } from '../../../common/InlineDialog';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldCatalogPurchaseConfirmView } from './handheld/HandheldShopConfirmViews';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -64,6 +66,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
     const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, isRaffling = false, previewStuffData = null, onConfirm = null, onCancel = null } = props;
     const spendingDisclaimerEnabled = GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false) === true;
     const [spendingDisclaimerAccepted, setSpendingDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
+    const isHandheld = useIsHandheld();
 
     if (!offer) return null;
 
@@ -82,6 +85,56 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
         isLimited ? 'has-limited' : ''
     ].filter(Boolean);
 
+    const confirmLabel = LocalizeText(isGift ? 'catalog.purchase_confirmation.gift' : `catalog.purchase_confirmation.${offer.isRentOffer ? 'rent' : 'buy'}`);
+    // Official PurchaseConfirmationDialog.setImage: the picture at its own size, centred in the 126x152 box and cut off at its edge.
+    const preview = isFurniture ? (
+        <LayoutFurniImageView
+            aria-label={offer.localizationName}
+            direction={90}
+            extraData={offer.product.extraParam}
+            objectData={previewStuffData}
+            productClassId={offer.product.productClassId}
+            productType={offer.product.productType}
+            role="img"
+        />
+    ) : offer.product?.productType === ProductTypeEnum.CHAT_STYLE ? (
+        <LayoutChatStyleImageView styleId={offer.product.extraParam} />
+    ) : offer.product?.productType === ProductTypeEnum.HABBICON ? (
+        // A habbicon has no icon file either: it is drawn as on its catalogue tile.
+        <LayoutHabbiconImageView id={offer.product.productClassId} />
+    ) : offer.product?.productType === ProductTypeEnum.ROBOT ? (
+        // A bot has no icon: it is shown as on its catalogue tile, by its figure.
+        <LayoutAvatarImageView direction={2} figure={offer.product.extraParam} />
+    ) : (
+        !!iconUrl && <img alt={offer.localizationName} src={iconUrl} />
+    );
+
+    if (isHandheld) {
+        const price = [
+            ...(hasCredits ? [{ amount: credits, type: -1 }] : []),
+            ...(hasActivityPoints ? [{ amount: activityPoints, type: offer.activityPointType }] : []),
+            ...(!hasCredits && !hasActivityPoints ? [{ amount: 0, type: -1 }] : [])
+        ];
+
+        return (
+            <HandheldCatalogPurchaseConfirmView
+                confirmLabel={confirmLabel}
+                disclaimer={spendingDisclaimerEnabled ? { accepted: spendingDisclaimerAccepted, onChange: setSpendingDisclaimerAccepted } : null}
+                freeItemCount={freeItemCount}
+                isSubmitting={isSubmitting}
+                limited={isLimited ? { left: offer.product.uniqueLimitedItemsLeft, size: offer.product.uniqueLimitedItemSeriesSize } : null}
+                name={offer.localizationName}
+                preview={preview}
+                price={price}
+                quantity={quantity}
+                raffle={isRaffling ? <CatalogPurchaseRaffleText /> : null}
+                title={title}
+                onCancel={onCancel}
+                onConfirm={onConfirm}
+            />
+        );
+    }
+
     return (
         <NativeTextTree>
             <InlineDialog
@@ -95,31 +148,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
             >
                 <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
                 <OctaneCardContentView classNames={contentClassNames} overflow="hidden">
-                    <div className="octane-catalog-purchase-confirm-preview">
-                        {/* Official PurchaseConfirmationDialog.setImage: the picture at its own size, centred in the
-                            126x152 box and cut off at its edge. */}
-                        {isFurniture ? (
-                            <LayoutFurniImageView
-                                aria-label={offer.localizationName}
-                                direction={90}
-                                extraData={offer.product.extraParam}
-                                objectData={previewStuffData}
-                                productClassId={offer.product.productClassId}
-                                productType={offer.product.productType}
-                                role="img"
-                            />
-                        ) : offer.product?.productType === ProductTypeEnum.CHAT_STYLE ? (
-                            <LayoutChatStyleImageView styleId={offer.product.extraParam} />
-                        ) : offer.product?.productType === ProductTypeEnum.HABBICON ? (
-                            // A habbicon has no icon file either: it is drawn as on its catalogue tile.
-                            <LayoutHabbiconImageView id={offer.product.productClassId} />
-                        ) : offer.product?.productType === ProductTypeEnum.ROBOT ? (
-                            // A bot has no icon: it is shown as on its catalogue tile, by its figure.
-                            <LayoutAvatarImageView direction={2} figure={offer.product.extraParam} />
-                        ) : (
-                            !!iconUrl && <img alt={offer.localizationName} src={iconUrl} />
-                        )}
-                    </div>
+                    <div className="octane-catalog-purchase-confirm-preview">{preview}</div>
                     <div className="octane-catalog-purchase-confirm-properties">
                         <strong className="octane-catalog-purchase-confirm-product">{offer.localizationName}</strong>
                         {quantity > 1 && <strong className="octane-catalog-purchase-confirm-quantity">X {quantity}</strong>}
@@ -182,7 +211,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                             type="button"
                             onClick={onConfirm}
                         >
-                            {LocalizeText(isGift ? 'catalog.purchase_confirmation.gift' : `catalog.purchase_confirmation.${offer.isRentOffer ? 'rent' : 'buy'}`)}
+                            {confirmLabel}
                         </BaseButton>
                     </div>
                 </OctaneCardContentView>
